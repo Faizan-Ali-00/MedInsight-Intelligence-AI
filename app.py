@@ -162,7 +162,7 @@ st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
-    
+
     :root {
         --bg: #f0f7f2;
         --paper: #ffffff;
@@ -179,7 +179,7 @@ st.markdown(
         --cream: #fbf7ed;
         --danger: #a44145;
     }
-    
+
     /* Brand with Medical Cross */
     .brand {
         display: flex;
@@ -187,7 +187,7 @@ st.markdown(
         align-items: center;
         padding: .5rem 0 1.5rem;
     }
-    
+
     .brand-mark {
         display: grid;
         place-items: center;
@@ -201,7 +201,7 @@ st.markdown(
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         border: 2px solid white;
     }
-    
+
     .brand-name {
         font-family: 'Manrope';
         font-size: 1rem;
@@ -209,14 +209,14 @@ st.markdown(
         letter-spacing: -.04em;
         color: white;
     }
-    
+
     .brand-sub {
         opacity: .6;
         font-size: .65rem;
         margin-top: .12rem;
         color: #dceee2;
     }
-    
+
     .side-section {
         font-size: .64rem;
         opacity: .5;
@@ -225,7 +225,7 @@ st.markdown(
         margin: .9rem 0 .5rem;
         color: #dceee2;
     }
-    
+
     /* Rest of your CSS */
     html,body,[class*="css"]{font-family:'DM Sans',sans-serif}.stApp{background:var(--bg);color:var(--ink)}
     [data-testid="stHeader"]{background:transparent}
@@ -235,7 +235,7 @@ st.markdown(
     [data-testid="stSidebar"] hr{border-color:rgba(255,255,255,.12)}
     [data-testid="stSidebar"] .stRadio label{padding:.45rem .55rem;border-radius:9px}
     [data-testid="stSidebar"] .stRadio label:hover{background:rgba(255,255,255,.08)}
-    
+
     .topbar{display:flex;justify-content:space-between;align-items:center;padding:.35rem 0 1.3rem}
     .topmark{font-family:'Manrope';font-size:1.15rem;font-weight:800;color:var(--forest);letter-spacing:-.05em}
     .topmark span{color:var(--green)}
@@ -244,7 +244,7 @@ st.markdown(
     .dot{width:7px;height:7px;background:#39a86f;border-radius:50%;animation:pulse-dot 2s infinite}
     @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
     .avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--forest);color:white;font-size:.7rem;font-weight:800}
-    
+
     .hero-premium {
         background: linear-gradient(135deg, #0a3226 0%, #1a5a44 60%, #0d3d2e 100%);
         border-radius: 24px;
@@ -291,7 +291,7 @@ st.markdown(
     .btn-primary-hero:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(46, 155, 98, 0.4); }
     .btn-secondary-hero { display: inline-flex; align-items: center; gap: .3rem; color: rgba(255, 255, 255, 0.85) !important; font-size: .8rem; font-weight: 600; text-decoration: none; padding: .75rem 1.5rem; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.12); transition: all .3s ease; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); }
     .btn-secondary-hero:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.25); transform: translateY(-2px); }
-    
+
     .doctor-combo { display: flex; align-items: flex-end; gap: 0; position: relative; }
     .paperboard-premium { width: 200px; height: 150px; background: white; border-radius: 16px; padding: 1rem 1.2rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25); transform: rotate(-4deg) translateY(-10px); margin-right: -30px; flex-shrink: 0; position: relative; z-index: 3; transition: transform 0.3s ease; }
     .paperboard-premium:hover { transform: rotate(-2deg) translateY(-12px); }
@@ -318,7 +318,7 @@ st.markdown(
     .hero-stats-float .stat-num { font-size: 1rem; font-weight: 800; color: #bdf0ca; display: block; }
     .hero-stats-float .stat-label { font-size: .45rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; letter-spacing: .05em; }
     .hero-stats-float .stat-divider { width: 1px; height: 25px; background: rgba(255, 255, 255, 0.08); }
-    
+
     @media(max-width:1024px) {
         .hero-premium { flex-direction: column; padding: 2rem 2rem; text-align: center; min-height: auto; }
         .hero-title { max-width: 100%; }
@@ -344,19 +344,19 @@ st.markdown(
         .hero-visual { min-height: 120px; }
         .btn-primary-hero, .btn-secondary-hero { font-size: .65rem; padding: .5rem 1rem; }
     }
-    
+
     .section-head{display:flex;justify-content:space-between;align-items:end;margin:2rem 0 .8rem}
     .section-title{font-family:'Manrope';font-size:1.3rem;font-weight:800;letter-spacing:-.045em;color:var(--forest)}
     .section-note{color:var(--muted);font-size:.75rem;margin-top:.2rem}
     .view-all{color:var(--forest2);font-size:.7rem;font-weight:800}
-    
+
     .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}
     .metric{background:white;border:1px solid var(--line);border-radius:14px;padding:1rem;transition:all .3s ease}
     .metric:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.05)}
     .metric-label{color:var(--muted);font-size:.65rem;font-weight:700}
     .metric-value{font-family:'Manrope';font-size:1.5rem;color:var(--forest);font-weight:800;margin-top:.2rem}
     .metric-meta{color:#3d9665;font-size:.65rem;margin-top:.1rem}
-    
+
     .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
     .info-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.1rem;min-height:170px;position:relative;overflow:hidden;transition:all .3s ease}
     .info-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.05)}
@@ -366,7 +366,7 @@ st.markdown(
     .info-title{font-family:'Manrope';font-size:1rem;line-height:1.1;color:var(--forest);max-width:180px;margin-top:2.2rem}
     .info-copy{font-size:.7rem;color:#668075;line-height:1.4;max-width:200px;margin-top:.4rem}
     .info-icon{position:absolute;right:.8rem;bottom:.8rem;width:48px;height:48px;border-radius:16px;background:var(--forest);color:#bdf0ca;display:grid;place-items:center;font-size:1.2rem}
-    
+
     .who-container{background:#f8fcff;border:1px solid #c8e4ef;border-left:4px solid #0093d0;border-radius:18px;padding:1.1rem;margin-top:1.5rem;box-shadow:0 4px 15px rgba(0,91,126,.04)}
     .who-header{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.6rem}
     .who-logo{background:linear-gradient(135deg,#0093d0,#007a7a);color:#fff;padding:.35rem .65rem;border-radius:8px;font-size:.65rem;font-weight:800;letter-spacing:.05em}
@@ -381,7 +381,7 @@ st.markdown(
     .who-post-meta{color:#80959d;font-size:.6rem;margin-top:.15rem}
     .who-link{color:#007a9f;font-size:.62rem;font-weight:800;text-decoration:none;white-space:nowrap}
     .who-link:hover{text-decoration:underline}
-    
+
     .workspace{background:white;border-radius:18px;padding:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,.03)}
     .workspace-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.7rem}
     .workspace-title{font-family:'Manrope';font-size:1rem;font-weight:800;color:var(--forest)}
@@ -391,7 +391,7 @@ st.markdown(
     [data-testid="stFileUploader"]{border:0;padding:0;background:transparent}
     [data-testid="stFileUploaderDropzone"]{border:0;background:transparent;min-height:50px}
     .hint{text-align:center;color:var(--muted);font-size:.65rem;margin-top:.2rem}
-    
+
     .report-container {
         background: white;
         border-radius: 16px;
@@ -461,19 +461,19 @@ st.markdown(
     .report-body strong { color: var(--forest); font-weight: 700; }
     .report-disclaimer { padding: 0.5rem 1.5rem 0.8rem 1.5rem; border-top: 1px solid var(--line); }
     .report-disclaimer .disclaimer-box { background: #fff8ef; border: 1px solid #f3dfc4; border-radius: 8px; padding: .5rem .7rem; color: #795d3a; font-size: .6rem; line-height: 1.4; }
-    
+
     .history-item{display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:1px solid #edf1ed}
     .history-item:last-child{border:0}
     .history-name{color:var(--forest);font-size:.75rem;font-weight:800}
     .history-meta{color:var(--muted);font-size:.62rem;margin-top:.1rem}
     .history-status{color:#317551;background:#edf8ef;padding:.25rem .5rem;border-radius:99px;font-size:.58rem;font-weight:800}
-    
+
     .stButton>button{background:var(--forest2);color:white;border:0;border-radius:12px;min-height:2.4rem;font-weight:800;transition:all .3s ease}
     .stButton>button:hover{background:var(--forest);color:white;transform:translateY(-2px);box-shadow:0 8px 20px rgba(13,61,46,.15)}
     .stTabs [data-baseweb="tab-list"]{gap:.4rem;background:#c5e7cc;border-radius:12px;padding:.25rem}
     .stTabs [data-baseweb="tab"]{font-size:.7rem;font-weight:800;color:var(--forest2);border-radius:8px;padding:.45rem .7rem}
     .stTabs [aria-selected="true"]{background:var(--forest);color:white!important}
-    
+
     .stTextArea textarea {
         font-size: 0.9rem !important;
         border-radius: 12px !important;
@@ -485,13 +485,12 @@ st.markdown(
         border-color: var(--green) !important;
         box-shadow: 0 0 0 3px rgba(46, 155, 98, 0.1) !important;
     }
-    
+
     .camera-selector {
         margin-bottom: 1rem;
     }
-    
+
     .footer{text-align:center;color:#6f8b78;font-size:.62rem;padding:1.5rem 0 .5rem}
-    
     @media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}.top-actions .status{display:none}.workspace-top{display:block}.privacy-tag{display:inline-block;margin-top:.5rem}}
     @media(max-width:600px){.report-body-wrapper{margin:0.3rem 0.8rem;padding:0.3rem}.report-body{padding:0.5rem 0.6rem 0.5rem 0.5rem;font-size:.8rem}}
     </style>
@@ -514,14 +513,17 @@ with st.sidebar:
         """,
         unsafe_allow_html=True
     )
-    
+
     st.markdown('<div class="side-section">Main menu</div>', unsafe_allow_html=True)
     page = st.radio("Main menu", ["Dashboard", "New analysis", "WHO knowledge", "History", "Saved insights"], label_visibility="collapsed")
+
     st.markdown('<div class="side-section">Quick capture</div>', unsafe_allow_html=True)
     st.caption("Capture here, then finish the analysis in the workspace.")
     sidebar_camera_file = st.camera_input("📷 Capture document", key="sidebar_camera")
+
     st.markdown('<div class="side-section">Account & help</div>', unsafe_allow_html=True)
     page2 = st.radio("Account and help", ["No extra page", "Safety & privacy", "Settings", "Help centre"], label_visibility="collapsed")
+
     st.markdown('<hr><div style="font-size:.7rem;opacity:.6;line-height:1.55">MedInsight AI is designed to support understanding—not diagnosis. Always involve a qualified healthcare professional in medical decisions.</div>', unsafe_allow_html=True)
 
 # --- Topbar ---
@@ -541,6 +543,7 @@ st.markdown(
 # --- Dashboard Page ---
 if page == "Dashboard":
     usage = st.session_state.usage
+
     if DOCTOR_DATA_URI:
         st.markdown(f'''
         <div class="hero-premium">
@@ -615,20 +618,22 @@ if page == "Dashboard":
         </div>
         ''', unsafe_allow_html=True)
         st.warning("⚠️ Doctor image not found. Please add 'doctor_portrait.jpg' to the 'assets' folder.")
-    
+
     if DOCTOR_INTRO_IMAGE.exists():
         doctor_col, trust_col = st.columns([0.22, 0.78], gap="medium")
         with doctor_col:
             st.image(str(DOCTOR_INTRO_IMAGE), caption="Your AI health-information guide", use_container_width=True, output_format="JPEG")
         with trust_col:
             st.markdown('<div style="padding:.7rem 0 0 .2rem"><div class="eyebrow" style="color:var(--forest);">A calmer way to begin</div><div class="section-title">Bring a question. We\'ll help organize the information.</div><div class="section-note" style="max-width:600px;margin-top:.4rem">Upload a document, take a photo, or speak your question. MedInsight AI is designed to support conversations with your healthcare professional.</div></div>', unsafe_allow_html=True)
-    
+
     st.markdown('<div class="section-head"><div><div class="section-title">Your workspace at a glance</div><div class="section-note">A simple record of the information you have reviewed.</div></div><div class="view-all">Updated just now</div></div>', unsafe_allow_html=True)
+
     usage = st.session_state.usage
     st.markdown(f'<div class="metrics"><div class="metric"><div class="metric-label">Documents analyzed</div><div class="metric-value">{usage.get("documents_analyzed", 0)}</div><div class="metric-meta">Updates after each review</div></div><div class="metric"><div class="metric-label">Saved insights</div><div class="metric-value">{usage.get("saved_insights", 0)}</div><div class="metric-meta">Across your categories</div></div><div class="metric"><div class="metric-label">Reports reviewed</div><div class="metric-value">{usage.get("reports_reviewed", 0)}</div><div class="metric-meta">One count per document</div></div><div class="metric"><div class="metric-label">System status</div><div class="metric-value">Ready</div><div class="metric-meta">Analysis service online</div></div></div>', unsafe_allow_html=True)
-    
+
     who_updates = fetch_who_updates()
     who_archive = update_who_archive(who_updates)
+
     who_html = '<div class="who-container"><div class="who-header"><span class="who-logo">🌍 WHO</span><span class="who-title">Health updates & guidelines</span><span class="who-live">Official source links</span></div><div class="who-note">Current items are linked from the official World Health Organization newsroom. Open the source for the complete update, date, evidence, and guidance.</div>'
     if who_updates:
         for item in who_updates[:4]:
@@ -639,7 +644,7 @@ if page == "Dashboard":
             who_html += f'<div class="who-post"><div class="who-icon">✦</div><div class="who-content"><div class="who-post-title">{title}</div><div class="who-post-meta">Official WHO resource</div></div><a class="who-link" href="{url}" target="_blank">Open ↗</a></div>'
     who_html += '</div>'
     st.markdown(who_html, unsafe_allow_html=True)
-    
+
     current_urls = {item["url"] for item in who_updates}
     older_updates = [item for item in who_archive if item.get("url") not in current_urls][:4]
     if older_updates:
@@ -648,9 +653,9 @@ if page == "Dashboard":
             older_html += f'<div class="who-post"><div class="who-icon">🕘</div><div class="who-content"><div class="who-post-title">{item["title"]}</div><div class="who-post-meta">First seen {item.get("first_seen", "")}</div></div><a class="who-link" href="{item["url"]}" target="_blank">Read ↗</a></div>'
         older_html += '</div>'
         st.markdown(older_html, unsafe_allow_html=True)
-    
+
     st.markdown('<div class="section-head" id="how-it-works"><div><div class="section-title">How MedInsight AI helps</div><div class="section-note">A thoughtful workflow from document to discussion.</div></div></div><div class="cards"><div class="info-card"><span class="badge">01 · UPLOAD</span><div class="info-title">Bring your document as it is.</div><div class="info-copy">Use a photo of a prescription, medicine box, or lab report. No retyping required.</div><div class="info-icon">↥</div></div><div class="info-card green"><span class="badge">02 · ANALYZE</span><div class="info-title">Find the important parts.</div><div class="info-copy">The visible information is grouped into familiar sections and explained simply.</div><div class="info-icon">✦</div></div><div class="info-card cream"><span class="badge">03 · DISCUSS</span><div class="info-title">Ask better questions.</div><div class="info-copy">Use the report as a starting point for your next conversation with a care team.</div><div class="info-icon">↗</div></div></div>', unsafe_allow_html=True)
-    
+
     if DOCTOR_GUIDANCE_IMAGE.exists():
         guidance_image_col, guidance_copy_col = st.columns([0.42, 0.58], gap="large")
         with guidance_image_col:
@@ -661,15 +666,15 @@ if page == "Dashboard":
 # --- New Analysis Page ---
 if page in ["Dashboard", "New analysis"]:
     st.markdown('<div class="section-head" id="new-analysis"><div><div class="section-title">Start a new analysis</div><div class="section-note">Upload an image or take a photo of your document.</div></div></div>', unsafe_allow_html=True)
-    
+
     st.markdown('<div class="workspace"><div class="workspace-top"><div><div class="workspace-title">Upload or capture a document</div><div class="workspace-copy">Upload an image of your prescription, lab report, or medicine label.</div></div><div class="privacy-tag">✦ Information-first, not diagnosis</div></div><div class="drop">', unsafe_allow_html=True)
-    
+
     # Only two tabs: Upload and Camera
     tab1, tab2 = st.tabs(["📤 Upload Image", "📷 Take Photo"])
-    
+
     uploaded_file = None
     camera_file = None
-    
+
     # TAB 1: Upload Image
     with tab1:
         st.markdown("### 📤 Upload a document image")
@@ -679,70 +684,58 @@ if page in ["Dashboard", "New analysis"]:
             image = Image.open(uploaded_file)
             st.image(image, caption="Document preview", use_container_width=True)
         st.markdown('<div class="hint">Drop an image here or browse your device · Use a well-lit, in-focus photo</div>', unsafe_allow_html=True)
-    
-    # TAB 2: Take Photo with Camera Selection
+
+    # TAB 2: Take Photo
+    #
+    # NOTE ON THE CAMERA FIX:
+    # Streamlit's camera_input widget already includes a built-in
+    # camera-flip control inside the live preview on devices that expose
+    # more than one camera (most phones). The previous version of this
+    # app tried to reimplement that switch with a selectbox that rendered
+    # THREE separate camera_input widgets (different `key` per choice).
+    # Selecting a different option unmounted one widget's live camera
+    # stream and mounted a brand new one; the browser doesn't always
+    # release the old stream before the new one requests the camera,
+    # which is exactly what produced the black screen on the "back
+    # camera" option. There is also no facingMode parameter in
+    # st.camera_input's Python API, so the three branches were
+    # functionally identical besides the bug they caused.
+    #
+    # Fix: use a single camera_input widget with one stable key. Users
+    # switch cameras using the flip icon built into the widget itself.
     with tab2:
         st.markdown("### 📷 Take a photo")
-        st.caption("Choose which camera to use and take a photo of your document.")
-        
-        # Camera Selection Dropdown
-        camera_choice = st.selectbox(
-            "📷 Select Camera",
-            ["Default Camera", "Back Camera", "Front Camera"],
-            help="Choose which camera to use. On mobile, 'Back Camera' is usually the main camera."
+        st.caption(
+            "Point your camera at the document and capture. On phones with "
+            "more than one camera, use the camera-flip icon inside the "
+            "preview below to switch between front and back — that control "
+            "is built into the widget itself."
         )
-        
-        # Show which camera is selected
-        if "Back" in camera_choice:
-            st.info("📸 Using Back Camera (Main Camera)")
-        elif "Front" in camera_choice:
-            st.info("📸 Using Front Camera (Selfie Camera)")
-        else:
-            st.info("📸 Using Default Camera")
-        
-        # Try using camera with different settings
-        # Note: Streamlit's camera_input doesn't directly support camera selection
-        # We use a workaround with different keys for different cameras
-        if "Back" in camera_choice:
-            # Use back camera - on mobile this should use the back camera
-            camera_file = st.camera_input(
-                "Take a photo of your document", 
-                label_visibility="collapsed", 
-                key="main_camera_back"
-            )
-        elif "Front" in camera_choice:
-            # Use front camera - on mobile this should use the front camera
-            camera_file = st.camera_input(
-                "Take a photo of your document", 
-                label_visibility="collapsed", 
-                key="main_camera_front"
-            )
-        else:
-            # Default camera
-            camera_file = st.camera_input(
-                "Take a photo of your document", 
-                label_visibility="collapsed", 
-                key="main_camera_default"
-            )
-        
+
+        camera_file = st.camera_input(
+            "Take a photo of your document",
+            label_visibility="collapsed",
+            key="main_camera"
+        )
+
         if camera_file:
             st.success("✅ Photo captured!")
             image = Image.open(camera_file)
             st.image(image, caption="Captured photo", use_container_width=True)
-    
+
     st.markdown('</div></div>', unsafe_allow_html=True)
-    
+
     # Get the image source
     image_source = uploaded_file if uploaded_file is not None else camera_file
     if image_source is None:
         image_source = sidebar_camera_file
-    
+
     # Show what's happening
     if image_source is not None:
         st.info("📷 Document uploaded. Click 'Analyze' to read and explain it.")
     else:
         st.info("💡 Upload an image or take a photo to get started.")
-    
+
     # Analysis button
     if st.button("✨ Analyze", use_container_width=True):
         with st.spinner("Analyzing..."):
@@ -752,14 +745,14 @@ if page in ["Dashboard", "New analysis"]:
                 else:
                     st.warning("Please upload an image or take a photo to analyze.")
                     st.stop()
-                
+
                 if image_source is not None:
                     is_new_analysis = register_analysis(image_source)
                     if is_new_analysis:
                         st.toast("✅ Review added to your workspace and history.")
-                
+
                 result_html = md.markdown(result, extensions=["extra", "sane_lists"])
-                
+
                 report_html = f'''
                 <div class="report-container">
                     <div class="report-header">
@@ -778,12 +771,12 @@ if page in ["Dashboard", "New analysis"]:
                     </div>
                 </div>
                 '''
-                
                 st.session_state["last_report_html"] = report_html
                 st.rerun()
+
             except Exception as exc:
                 st.error(f"❌ We couldn't complete the analysis. Details: {exc}")
-    
+
     if st.session_state.get("last_report_html"):
         st.markdown(st.session_state["last_report_html"], unsafe_allow_html=True)
 
@@ -791,27 +784,33 @@ if page in ["Dashboard", "New analysis"]:
 if page == "WHO knowledge":
     st.markdown('<div class="section-head"><div><div class="section-title">🌍 WHO Knowledge & Updates</div><div class="section-note">A curated doorway to official World Health Organization information.</div></div><div class="view-all">Official sources</div></div>', unsafe_allow_html=True)
     st.info("ℹ️ MedInsight AI links to WHO materials but does not replace the original source. Always check the official WHO page for the latest wording, dates, and guidance.")
+
     updates = fetch_who_updates()
     who_archive = update_who_archive(updates)
+
     st.markdown('<div class="section-head"><div><div class="section-title">📰 Latest WHO newsroom updates</div><div class="section-note">Fetched from the official WHO newsroom when the service is available.</div></div></div>', unsafe_allow_html=True)
     if updates:
         for update in updates:
             st.markdown(f'<div class="history-item"><div><div class="history-name">{update["title"]}</div><div class="history-meta">WHO Newsroom · Official source</div></div><a class="view-all" href="{update["url"]}" target="_blank">Read on WHO ↗</a></div>', unsafe_allow_html=True)
     else:
         st.warning("⚠️ WHO newsroom updates could not be loaded right now. Use the official links below.")
+
     current_urls = {item["url"] for item in updates}
     older_updates = [item for item in who_archive if item.get("url") not in current_urls]
     if older_updates:
         st.markdown('<div class="section-head"><div><div class="section-title">🗂️ Previously shown updates</div><div class="section-note">Saved locally so nothing gets lost once WHO refreshes their live newsroom page.</div></div></div>', unsafe_allow_html=True)
         for item in older_updates[:10]:
             st.markdown(f'<div class="history-item"><div><div class="history-name">{item["title"]}</div><div class="history-meta">First seen {item.get("first_seen", "")}</div></div><a class="view-all" href="{item["url"]}" target="_blank">Read on WHO ↗</a></div>', unsafe_allow_html=True)
+
     st.markdown('<div class="section-head"><div><div class="section-title">📚 Health topic library</div><div class="section-note">Browse official WHO topic pages across prevention, conditions, health systems, and emergencies.</div></div></div>', unsafe_allow_html=True)
+
     topic_search = st.text_input("🔍 Search WHO topics", placeholder="Try diabetes, mental health, vaccines…")
     filtered_topics = {name: url for name, url in WHO_TOPICS.items() if not topic_search or topic_search.lower() in name.lower()}
     topic_columns = st.columns(2)
     for index, (topic_name, topic_url) in enumerate(filtered_topics.items()):
         with topic_columns[index % 2]:
             st.markdown(f'<div class="history-item"><div><div class="history-name">{topic_name}</div><div class="history-meta">Official WHO health topic</div></div><a class="view-all" href="{topic_url}" target="_blank">Open ↗</a></div>', unsafe_allow_html=True)
+
     st.markdown('<div class="section-head"><div><div class="section-title">🚨 Emergency and outbreak information</div><div class="section-note">Use WHO Disease Outbreak News for confirmed acute public-health events and potential events of concern.</div></div></div>', unsafe_allow_html=True)
     st.markdown('<div class="workspace"><div class="history-item"><div><div class="history-name">WHO Disease Outbreak News</div><div class="history-meta">Official outbreak reports and public-health event updates.</div></div><a class="view-all" href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank">Open WHO DON ↗</a></div><div class="history-item"><div><div class="history-name">WHO Fact Sheets</div><div class="history-meta">Evidence-based summaries across health conditions and interventions.</div></div><a class="view-all" href="https://www.who.int/news-room/fact-sheets" target="_blank">Browse fact sheets ↗</a></div><div class="history-item"><div><div class="history-name">WHO Data</div><div class="history-meta">Official data, indicators, and global health observatory resources.</div></div><a class="view-all" href="https://www.who.int/data" target="_blank">Open WHO Data ↗</a></div></div>', unsafe_allow_html=True)
 
@@ -819,6 +818,7 @@ if page == "WHO knowledge":
 if page == "History":
     usage = st.session_state.usage
     st.markdown(f'<div class="section-head"><div><div class="section-title">📋 Analysis history</div><div class="section-note">Every document you have reviewed in MedInsight AI.</div></div><div class="view-all">{usage.get("documents_analyzed", 0)} total documents</div></div>', unsafe_allow_html=True)
+
     history_rows = usage.get("history", [])
     if history_rows:
         history_html = '<div class="workspace">'
