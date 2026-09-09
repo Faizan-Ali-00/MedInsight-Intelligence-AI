@@ -6,10 +6,15 @@ import tempfile
 import base64
 import json
 import hashlib
+from io import BytesIO
 from pathlib import Path
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
+
+# Back-camera-only capture widget (replaces st.camera_input, which has no
+# facingMode / back-camera option in its Python API).
+from streamlit_back_camera_input import back_camera_input
 
 # Import from gemini_service
 from gemini_service import (
@@ -156,6 +161,43 @@ def register_analysis(image_source):
     usage["history"] = usage["history"][:20]
     save_usage(usage)
     return True
+
+# --- Camera helper ---
+#
+# NOTE ON THE CAMERA FIX:
+# st.camera_input has no facingMode / "back camera only" option in its
+# Python API, so it can't be forced away from the front camera in a
+# reliable, cross-device way. `back_camera_input` (from the
+# streamlit-back-camera-input package) opens the camera stream directly
+# with getUserMedia({facingMode: "environment"}), so it defaults to the
+# rear camera on phones without exposing a flip control that can get
+# stuck on the front camera.
+#
+# The component's return value isn't guaranteed to be a drop-in
+# UploadedFile (it may be a PIL Image or a bytes-like object depending on
+# version), so we normalize it here into something with .getvalue() and
+# .name, which is what register_analysis() / analyze_health_document_openai()
+# and the rest of this file expect.
+def normalize_camera_image(raw, filename="camera_capture.jpg"):
+    """Coerce whatever back_camera_input() returns into an UploadedFile-like object."""
+    if raw is None:
+        return None
+    try:
+        if hasattr(raw, "save"):
+            # Already a PIL Image
+            pil_img = raw
+        else:
+            data = raw.getvalue() if hasattr(raw, "getvalue") else raw
+            pil_img = Image.open(BytesIO(data))
+        buf = BytesIO()
+        pil_img.convert("RGB").save(buf, format="JPEG")
+        buf.seek(0)
+        buf.name = filename
+        return buf
+    except Exception:
+        # If normalization fails for any reason, fall back to the raw
+        # value so the rest of the app can still try to use it.
+        return raw
 
 # --- CSS ---
 st.markdown(
@@ -518,8 +560,9 @@ with st.sidebar:
     page = st.radio("Main menu", ["Dashboard", "New analysis", "WHO knowledge", "History", "Saved insights"], label_visibility="collapsed")
 
     st.markdown('<div class="side-section">Quick capture</div>', unsafe_allow_html=True)
-    st.caption("Capture here, then finish the analysis in the workspace.")
-    sidebar_camera_file = st.camera_input("📷 Capture document", key="sidebar_camera")
+    st.caption("Capture here, then finish the analysis in the workspace. Uses your back camera by default.")
+    sidebar_camera_raw = back_camera_input(key="sidebar_back_camera")
+    sidebar_camera_file = normalize_camera_image(sidebar_camera_raw, "sidebar_capture.jpg")
 
     st.markdown('<div class="side-section">Account & help</div>', unsafe_allow_html=True)
     page2 = st.radio("Account and help", ["No extra page", "Safety & privacy", "Settings", "Help centre"], label_visibility="collapsed")
@@ -688,40 +731,31 @@ if page in ["Dashboard", "New analysis"]:
     # TAB 2: Take Photo
     #
     # NOTE ON THE CAMERA FIX:
-    # Streamlit's camera_input widget already includes a built-in
-    # camera-flip control inside the live preview on devices that expose
-    # more than one camera (most phones). The previous version of this
-    # app tried to reimplement that switch with a selectbox that rendered
-    # THREE separate camera_input widgets (different `key` per choice).
-    # Selecting a different option unmounted one widget's live camera
-    # stream and mounted a brand new one; the browser doesn't always
-    # release the old stream before the new one requests the camera,
-    # which is exactly what produced the black screen on the "back
-    # camera" option. There is also no facingMode parameter in
-    # st.camera_input's Python API, so the three branches were
-    # functionally identical besides the bug they caused.
+    # st.camera_input has no facingMode / back-camera-only option in its
+    # Python API, so trying to rebuild a front/back switch on top of it
+    # (as the previous version of this app did with a selectbox mounting
+    # three separate camera_input widgets) causes browsers to fight over
+    # the camera stream and produces a black screen.
     #
-    # Fix: use a single camera_input widget with one stable key. Users
-    # switch cameras using the flip icon built into the widget itself.
+    # back_camera_input() opens the stream directly with
+    # getUserMedia({facingMode: "environment"}), so it defaults to the
+    # rear camera with no extra switching UI needed. Users simply tap the
+    # video preview to capture.
     with tab2:
         st.markdown("### 📷 Take a photo")
         st.caption(
-            "Point your camera at the document and capture. On phones with "
-            "more than one camera, use the camera-flip icon inside the "
-            "preview below to switch between front and back — that control "
-            "is built into the widget itself."
+            "Point your camera at the document and tap the video preview "
+            "to capture. This opens your back (rear) camera by default."
         )
 
-        camera_file = st.camera_input(
-            "Take a photo of your document",
-            label_visibility="collapsed",
-            key="main_camera"
-        )
+        camera_raw = back_camera_input(key="main_back_camera")
+        camera_file = normalize_camera_image(camera_raw, "captured_document.jpg")
 
         if camera_file:
             st.success("✅ Photo captured!")
             image = Image.open(camera_file)
             st.image(image, caption="Captured photo", use_container_width=True)
+            camera_file.seek(0)  # rewind so downstream reads start from byte 0
 
     st.markdown('</div></div>', unsafe_allow_html=True)
 
