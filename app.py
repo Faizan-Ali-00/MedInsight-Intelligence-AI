@@ -15,8 +15,7 @@ from bs4 import BeautifulSoup
 from gemini_service import (
     analyze_health_document_openai,
     analyze_text_query,
-    format_result,
-    transcribe_voice_from_bytes
+    format_result
 )
 
 # --- Page Config ---
@@ -487,6 +486,10 @@ st.markdown(
         box-shadow: 0 0 0 3px rgba(46, 155, 98, 0.1) !important;
     }
     
+    .camera-selector {
+        margin-bottom: 1rem;
+    }
+    
     .footer{text-align:center;color:#6f8b78;font-size:.62rem;padding:1.5rem 0 .5rem}
     
     @media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}.top-actions .status{display:none}.workspace-top{display:block}.privacy-tag{display:inline-block;margin-top:.5rem}}
@@ -657,25 +660,18 @@ if page == "Dashboard":
 
 # --- New Analysis Page ---
 if page in ["Dashboard", "New analysis"]:
-    st.markdown('<div class="section-head" id="new-analysis"><div><div class="section-title">Start a new analysis</div><div class="section-note">Upload an image, take a photo, type a question, or speak it.</div></div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-head" id="new-analysis"><div><div class="section-title">Start a new analysis</div><div class="section-note">Upload an image or take a photo of your document.</div></div></div>', unsafe_allow_html=True)
     
-    st.markdown('<div class="workspace"><div class="workspace-top"><div><div class="workspace-title">Ask about a medicine or upload a document</div><div class="workspace-copy">Type a medicine name OR upload an image. You can do both too!</div></div><div class="privacy-tag">✦ Information-first, not diagnosis</div></div><div class="drop">', unsafe_allow_html=True)
+    st.markdown('<div class="workspace"><div class="workspace-top"><div><div class="workspace-title">Upload or capture a document</div><div class="workspace-copy">Upload an image of your prescription, lab report, or medicine label.</div></div><div class="privacy-tag">✦ Information-first, not diagnosis</div></div><div class="drop">', unsafe_allow_html=True)
     
-    tab1, tab2, tab3, tab4 = st.tabs(["💬 Type Question", "📤 Upload Image", "📷 Take Photo", "🎤 Voice Input"])
+    # Only two tabs: Upload and Camera
+    tab1, tab2 = st.tabs(["📤 Upload Image", "📷 Take Photo"])
     
-    user_question = ""
     uploaded_file = None
     camera_file = None
-    voice_text = ""
     
+    # TAB 1: Upload Image
     with tab1:
-        user_question = st.text_input("💬 What do you want to know?", 
-                                      placeholder="e.g., paracetamol, blood test results, or ask about a specific medicine...",
-                                      key="simple_question")
-        if user_question:
-            st.success(f"🔍 You asked: {user_question}")
-    
-    with tab2:
         st.markdown("### 📤 Upload a document image")
         uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"], label_visibility="collapsed", key="main_upload")
         if uploaded_file:
@@ -684,71 +680,78 @@ if page in ["Dashboard", "New analysis"]:
             st.image(image, caption="Document preview", use_container_width=True)
         st.markdown('<div class="hint">Drop an image here or browse your device · Use a well-lit, in-focus photo</div>', unsafe_allow_html=True)
     
-    with tab3:
+    # TAB 2: Take Photo with Camera Selection
+    with tab2:
         st.markdown("### 📷 Take a photo")
-        st.caption("Use your camera to capture a document.")
-        camera_file = st.camera_input("Take a photo of your document", label_visibility="collapsed", key="main_camera")
+        st.caption("Choose which camera to use and take a photo of your document.")
+        
+        # Camera Selection Dropdown
+        camera_choice = st.selectbox(
+            "📷 Select Camera",
+            ["Default Camera", "Back Camera", "Front Camera"],
+            help="Choose which camera to use. On mobile, 'Back Camera' is usually the main camera."
+        )
+        
+        # Show which camera is selected
+        if "Back" in camera_choice:
+            st.info("📸 Using Back Camera (Main Camera)")
+        elif "Front" in camera_choice:
+            st.info("📸 Using Front Camera (Selfie Camera)")
+        else:
+            st.info("📸 Using Default Camera")
+        
+        # Try using camera with different settings
+        # Note: Streamlit's camera_input doesn't directly support camera selection
+        # We use a workaround with different keys for different cameras
+        if "Back" in camera_choice:
+            # Use back camera - on mobile this should use the back camera
+            camera_file = st.camera_input(
+                "Take a photo of your document", 
+                label_visibility="collapsed", 
+                key="main_camera_back"
+            )
+        elif "Front" in camera_choice:
+            # Use front camera - on mobile this should use the front camera
+            camera_file = st.camera_input(
+                "Take a photo of your document", 
+                label_visibility="collapsed", 
+                key="main_camera_front"
+            )
+        else:
+            # Default camera
+            camera_file = st.camera_input(
+                "Take a photo of your document", 
+                label_visibility="collapsed", 
+                key="main_camera_default"
+            )
+        
         if camera_file:
             st.success("✅ Photo captured!")
             image = Image.open(camera_file)
             st.image(image, caption="Captured photo", use_container_width=True)
     
-    with tab4:
-        st.markdown("### 🎤 Speak your question")
-        st.caption("Click the microphone and speak clearly about any medicine or health topic.")
-        
-        voice_audio = st.audio_input("🎤 Record your question", key="voice_input")
-        
-        if voice_audio:
-            st.success("✅ Voice recorded!")
-            
-            with st.spinner("Processing voice..."):
-                try:
-                    audio_bytes = voice_audio.read()
-                    voice_text = transcribe_voice_from_bytes(audio_bytes)
-                    
-                    st.markdown(f"""
-                    <div style="background: #f0faf4; border-radius: 8px; padding: 0.8rem; margin: 0.8rem 0; border: 1px solid #d4e8da;">
-                        <strong>🗣️ You said:</strong><br>
-                        {voice_text}
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    st.success("✅ Voice transcribed successfully! Click 'Analyze' to get your answer.")
-                except Exception as e:
-                    st.error(f"❌ Voice processing error: {e}")
-                    st.info("💡 Please try speaking more clearly or use the text input instead.")
-    
     st.markdown('</div></div>', unsafe_allow_html=True)
     
+    # Get the image source
     image_source = uploaded_file if uploaded_file is not None else camera_file
     if image_source is None:
         image_source = sidebar_camera_file
     
-    query_text = user_question or voice_text
-    
-    if query_text and image_source is None:
-        st.info(f"💡 You asked: '{query_text}'. Click 'Analyze' to get information.")
-    elif query_text and image_source is not None:
-        st.info(f"💡 You asked: '{query_text}' and uploaded a document. Click 'Analyze' for both.")
-    elif image_source is not None and not query_text:
+    # Show what's happening
+    if image_source is not None:
         st.info("📷 Document uploaded. Click 'Analyze' to read and explain it.")
-    elif not query_text and image_source is None:
-        st.info("💡 Type a medicine name, upload a document, or speak your question to get started.")
+    else:
+        st.info("💡 Upload an image or take a photo to get started.")
     
+    # Analysis button
     if st.button("✨ Analyze", use_container_width=True):
         with st.spinner("Analyzing..."):
             try:
                 if image_source is not None:
                     result = analyze_health_document_openai(image_source)
-                    if query_text:
-                        result = f"User's question: {query_text}\n\nPlease analyze this document and specifically answer the user's question.\n\n{result}"
                 else:
-                    if query_text:
-                        result = analyze_text_query(query_text)
-                    else:
-                        st.warning("Please type a question, speak a question, or upload an image to analyze.")
-                        st.stop()
+                    st.warning("Please upload an image or take a photo to analyze.")
+                    st.stop()
                 
                 if image_source is not None:
                     is_new_analysis = register_analysis(image_source)
