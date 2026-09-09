@@ -13,8 +13,10 @@ import requests
 from bs4 import BeautifulSoup
 
 # Back-camera-only capture widget (replaces st.camera_input, which has no
-# facingMode / back-camera option in its Python API).
-from streamlit_back_camera_input import back_camera_input
+# facingMode / back-camera option in its Python API). This is our own small
+# custom component (see camera_component/) with a real "Capture photo" /
+# "Retake" button pair, so we're not dependent on a third-party package.
+from camera_component import back_camera_capture
 
 # Import from gemini_service
 from gemini_service import (
@@ -167,37 +169,45 @@ def register_analysis(image_source):
 # NOTE ON THE CAMERA FIX:
 # st.camera_input has no facingMode / "back camera only" option in its
 # Python API, so it can't be forced away from the front camera in a
-# reliable, cross-device way. `back_camera_input` (from the
-# streamlit-back-camera-input package) opens the camera stream directly
-# with getUserMedia({facingMode: "environment"}), so it defaults to the
-# rear camera on phones without exposing a flip control that can get
-# stuck on the front camera.
+# reliable, cross-device way. Our custom back_camera_capture() component
+# (see camera_component/) opens the stream directly with
+# getUserMedia({facingMode: "environment"}), so it defaults to the rear
+# camera, and it has an explicit "📸 Capture photo" / "🔄 Retake" button
+# pair (no ambiguous tap-to-capture).
 #
-# The component's return value isn't guaranteed to be a drop-in
-# UploadedFile (it may be a PIL Image or a bytes-like object depending on
-# version), so we normalize it here into something with .getvalue() and
-# .name, which is what register_analysis() / analyze_health_document_openai()
-# and the rest of this file expect.
-def normalize_camera_image(raw, filename="camera_capture.jpg"):
-    """Coerce whatever back_camera_input() returns into an UploadedFile-like object."""
-    if raw is None:
+# The component returns a base64 data URL string (e.g.
+# "data:image/jpeg;base64,...."). We decode that here into a BytesIO with
+# .getvalue() and .name, which is what register_analysis() /
+# analyze_health_document_openai() and the rest of this file expect.
+def data_url_to_filelike(data_url, filename="camera_capture.jpg"):
+    """Decode a base64 data URL from back_camera_capture() into an UploadedFile-like object."""
+    if not data_url or not isinstance(data_url, str) or not data_url.startswith("data:"):
         return None
     try:
-        if hasattr(raw, "save"):
-            # Already a PIL Image
-            pil_img = raw
-        else:
-            data = raw.getvalue() if hasattr(raw, "getvalue") else raw
-            pil_img = Image.open(BytesIO(data))
-        buf = BytesIO()
-        pil_img.convert("RGB").save(buf, format="JPEG")
-        buf.seek(0)
+        _header, encoded = data_url.split(",", 1)
+        raw_bytes = base64.b64decode(encoded)
+        buf = BytesIO(raw_bytes)
         buf.name = filename
         return buf
-    except Exception:
-        # If normalization fails for any reason, fall back to the raw
-        # value so the rest of the app can still try to use it.
-        return raw
+    except (ValueError, base64.binascii.Error):
+        return None
+
+# --- Medical quotes for the sidebar ---
+MEDICAL_QUOTES = [
+    ("The good physician treats the disease; the great physician treats the patient who has the disease.", "William Osler"),
+    ("Wherever the art of medicine is loved, there is also a love of humanity.", "Hippocrates"),
+    ("Prevention is better than cure.", "Desiderius Erasmus"),
+    ("The art of medicine consists of amusing the patient while nature cures the disease.", "Voltaire"),
+    ("He who has health has hope, and he who has hope has everything.", "Thomas Carlyle"),
+    ("To cure sometimes, to relieve often, to comfort always.", "Attributed to Hippocrates"),
+    ("Medicine is a science of uncertainty and an art of probability.", "William Osler"),
+    ("The natural healing force within each of us is the greatest force in getting well.", "Hippocrates"),
+]
+
+def get_daily_quote():
+    """Pick one quote deterministically per calendar day, so it's stable for the whole session."""
+    idx = datetime.now().toordinal() % len(MEDICAL_QUOTES)
+    return MEDICAL_QUOTES[idx]
 
 # --- CSS ---
 st.markdown(
@@ -266,6 +276,35 @@ st.markdown(
         letter-spacing: .15em;
         margin: .9rem 0 .5rem;
         color: #dceee2;
+    }
+
+    .sidebar-quote {
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.1);
+        border-left: 3px solid #7edba0;
+        border-radius: 12px;
+        padding: .75rem .9rem;
+        margin: .1rem 0 .3rem;
+    }
+    .sidebar-quote .quote-mark {
+        font-size: 1.3rem;
+        line-height: 1;
+        color: #7edba0;
+        font-family: 'Manrope';
+        font-weight: 800;
+    }
+    .sidebar-quote .quote-text {
+        color: #eaf5ee !important;
+        font-size: .74rem;
+        line-height: 1.5;
+        font-style: italic;
+        margin: .25rem 0 .4rem;
+    }
+    .sidebar-quote .quote-author {
+        color: #91deb0 !important;
+        font-size: .65rem;
+        font-weight: 800;
+        text-align: right;
     }
 
     /* Rest of your CSS */
@@ -556,14 +595,31 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
+    # --- Main menu ---
     st.markdown('<div class="side-section">Main menu</div>', unsafe_allow_html=True)
     page = st.radio("Main menu", ["Dashboard", "New analysis", "WHO knowledge", "History", "Saved insights"], label_visibility="collapsed")
 
+    # --- Quick capture ---
     st.markdown('<div class="side-section">Quick capture</div>', unsafe_allow_html=True)
     st.caption("Capture here, then finish the analysis in the workspace. Uses your back camera by default.")
-    sidebar_camera_raw = back_camera_input(key="sidebar_back_camera")
-    sidebar_camera_file = normalize_camera_image(sidebar_camera_raw, "sidebar_capture.jpg")
+    sidebar_camera_raw = back_camera_capture(key="sidebar_back_camera")
+    sidebar_camera_file = data_url_to_filelike(sidebar_camera_raw, "sidebar_capture.jpg")
 
+    # --- Health wisdom (daily medical quote) ---
+    st.markdown('<div class="side-section">Health wisdom</div>', unsafe_allow_html=True)
+    quote_text, quote_author = get_daily_quote()
+    st.markdown(
+        f'''
+        <div class="sidebar-quote">
+            <div class="quote-mark">"</div>
+            <div class="quote-text">{quote_text}</div>
+            <div class="quote-author">— {quote_author}</div>
+        </div>
+        ''',
+        unsafe_allow_html=True
+    )
+
+    # --- Account & help ---
     st.markdown('<div class="side-section">Account & help</div>', unsafe_allow_html=True)
     page2 = st.radio("Account and help", ["No extra page", "Safety & privacy", "Settings", "Help centre"], label_visibility="collapsed")
 
@@ -737,19 +793,20 @@ if page in ["Dashboard", "New analysis"]:
     # three separate camera_input widgets) causes browsers to fight over
     # the camera stream and produces a black screen.
     #
-    # back_camera_input() opens the stream directly with
-    # getUserMedia({facingMode: "environment"}), so it defaults to the
-    # rear camera with no extra switching UI needed. Users simply tap the
-    # video preview to capture.
+    # back_camera_capture() (our own component in camera_component/) opens
+    # the stream directly with getUserMedia({facingMode: "environment"}),
+    # so it defaults to the rear camera, and it has its own visible
+    # "📸 Capture photo" / "🔄 Retake" buttons built into the widget.
     with tab2:
         st.markdown("### 📷 Take a photo")
         st.caption(
-            "Point your camera at the document and tap the video preview "
-            "to capture. This opens your back (rear) camera by default."
+            "Point your camera at the document and tap the "
+            "'📸 Capture photo' button below. This opens your back (rear) "
+            "camera by default."
         )
 
-        camera_raw = back_camera_input(key="main_back_camera")
-        camera_file = normalize_camera_image(camera_raw, "captured_document.jpg")
+        camera_raw = back_camera_capture(key="main_back_camera")
+        camera_file = data_url_to_filelike(camera_raw, "captured_document.jpg")
 
         if camera_file:
             st.success("✅ Photo captured!")
