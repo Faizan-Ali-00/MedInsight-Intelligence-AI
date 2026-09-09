@@ -27,10 +27,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- Initialize Session State ---
-if "sidebar_open" not in st.session_state:
-    st.session_state.sidebar_open = True
-
 # --- Asset Paths ---
 _asset_candidates = [
     Path(__file__).resolve().parent / "assets" / "doctor_portrait.jpg",
@@ -185,41 +181,6 @@ st.markdown(
         --danger: #a44145;
     }
     
-    /* Sidebar Toggle Button - Proper Styling */
-    .stButton button[data-testid="baseButton-secondary"] {
-        background: #0d3d2e !important;
-        color: white !important;
-        border: 2px solid rgba(255,255,255,0.2) !important;
-        border-radius: 50% !important;
-        width: 44px !important;
-        height: 44px !important;
-        padding: 0 !important;
-        font-size: 22px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-        min-height: unset !important;
-        line-height: 1 !important;
-    }
-    
-    .stButton button[data-testid="baseButton-secondary"]:hover {
-        transform: scale(1.1) !important;
-        background: #1a5a44 !important;
-        box-shadow: 0 6px 25px rgba(0,0,0,0.3) !important;
-        border-color: rgba(255,255,255,0.4) !important;
-    }
-    
-    .stButton button[data-testid="baseButton-secondary"]:active {
-        transform: scale(0.95) !important;
-    }
-    
-    /* Hide sidebar when closed */
-    .sidebar-closed [data-testid="stSidebar"] {
-        display: none !important;
-    }
-    
     /* Brand with Medical Cross */
     .brand {
         display: flex;
@@ -269,14 +230,14 @@ st.markdown(
     /* Rest of your CSS */
     html,body,[class*="css"]{font-family:'DM Sans',sans-serif}.stApp{background:var(--bg);color:var(--ink)}
     [data-testid="stHeader"]{background:transparent}
-    .block-container{max-width:1350px;padding:1rem 2.4rem 2rem;padding-top:70px}
+    .block-container{max-width:1350px;padding:1rem 2.4rem 2rem}
     [data-testid="stSidebar"]{background:var(--forest);border:0}
     [data-testid="stSidebar"] *{color:#dceee2!important}
     [data-testid="stSidebar"] hr{border-color:rgba(255,255,255,.12)}
     [data-testid="stSidebar"] .stRadio label{padding:.45rem .55rem;border-radius:9px}
     [data-testid="stSidebar"] .stRadio label:hover{background:rgba(255,255,255,.08)}
     
-    .topbar{display:flex;justify-content:space-between;align-items:center;padding:.35rem 0 1.3rem;padding-left:70px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:.35rem 0 1.3rem}
     .topmark{font-family:'Manrope';font-size:1.15rem;font-weight:800;color:var(--forest);letter-spacing:-.05em}
     .topmark span{color:var(--green)}
     .top-actions{display:flex;gap:.6rem;align-items:center}
@@ -534,15 +495,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-# --- Sidebar Toggle Button (Using Streamlit Button) ---
-# Create a small row for the toggle button
-col1, col2 = st.columns([1, 20])
-
-with col1:
-    if st.button("☰", key="sidebar_toggle", help="Toggle Sidebar", type="secondary"):
-        st.session_state.sidebar_open = not st.session_state.sidebar_open
-        st.rerun()
 
 # --- Sidebar ---
 with st.sidebar:
