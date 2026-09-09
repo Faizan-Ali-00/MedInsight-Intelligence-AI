@@ -27,26 +27,9 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- Initialize Session State for Theme ---
-if "theme" not in st.session_state:
-    st.session_state.theme = "light"
-
-if "sidebar_state" not in st.session_state:
-    st.session_state.sidebar_state = "expanded"
-
-# --- Theme Toggle Function ---
-def toggle_theme():
-    if st.session_state.theme == "light":
-        st.session_state.theme = "dark"
-    else:
-        st.session_state.theme = "light"
-
-# --- Sidebar Toggle Function ---
-def toggle_sidebar():
-    if st.session_state.sidebar_state == "expanded":
-        st.session_state.sidebar_state = "collapsed"
-    else:
-        st.session_state.sidebar_state = "expanded"
+# --- Initialize Session State ---
+if "sidebar_open" not in st.session_state:
+    st.session_state.sidebar_open = True
 
 # --- Asset Paths ---
 _asset_candidates = [
@@ -179,56 +162,17 @@ def register_analysis(image_source):
     save_usage(usage)
     return True
 
-# --- Theme CSS ---
-def get_theme_css():
-    if st.session_state.theme == "dark":
-        return """
-        <style>
-        :root {
-            --bg: #1a1a2e;
-            --paper: #16213e;
-            --ink: #e0e0e0;
-            --muted: #a0a0a0;
-            --line: #2a2a4a;
-            --forest: #4a9e6e;
-            --forest2: #3a8e5e;
-            --green: #5aae7e;
-            --green-light: #2a3a3e;
-            --green-lighter: #1a2a2e;
-            --lime: #4a8e6e;
-            --sage: #2a3a3e;
-            --cream: #2a2a3e;
-        }
-        .stApp { background: #1a1a2e; }
-        .stApp > div { background: #1a1a2e; }
-        [data-testid="stSidebar"] { background: #0d0d1a; }
-        .workspace { background: #16213e; }
-        .metric { background: #16213e; border-color: #2a2a4a; }
-        .info-card { background: #16213e; border-color: #2a2a4a; }
-        .info-card.green { background: #1a2a2e; }
-        .info-card.cream { background: #2a2a2e; }
-        .report-container { background: #16213e; border-color: #2a2a4a; }
-        .report-header { background: #1a2a2e; }
-        .report-body-wrapper { background: #1a2a2e; }
-        .drop { background: #1a2a2e; border-color: #3a6e4a; }
-        .who-container { background: #1a2a3e; border-color: #2a4a5e; }
-        .history-item { border-color: #2a2a4a; }
-        .stButton>button { background: #2a5a4a; }
-        .stButton>button:hover { background: #3a7a5a; }
-        </style>
-        """
-    else:
-        return ""
+# --- Toggle Sidebar Function ---
+def toggle_sidebar():
+    st.session_state.sidebar_open = not st.session_state.sidebar_open
 
-# --- STYLES ---
+# --- CSS ---
 st.markdown(
-    f"""
+    """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
     
-    {get_theme_css()}
-    
-    :root {{
+    :root {
         --bg: #f0f7f2;
         --paper: #ffffff;
         --ink: #1a2e26;
@@ -243,83 +187,106 @@ st.markdown(
         --sage: #e8f5ec;
         --cream: #fbf7ed;
         --danger: #a44145;
-    }}
+    }
     
-    /* Sidebar Toggle Button */
-    .sidebar-toggle-btn {{
+    /* Sidebar Toggle Container */
+    .sidebar-toggle-container {
         position: fixed;
-        top: 10px;
-        left: 10px;
+        top: 15px;
+        left: 15px;
         z-index: 999;
-        background: var(--forest);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .sidebar-toggle-container .toggle-label {
+        color: #0d3d2e;
+        font-size: 12px;
+        font-weight: 600;
+        background: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .sidebar-toggle-container:hover .toggle-label {
+        opacity: 1;
+    }
+    
+    /* Hide sidebar when closed */
+    .sidebar-closed [data-testid="stSidebar"] {
+        display: none !important;
+    }
+    
+    /* Brand with Medical Cross */
+    .brand {
+        display: flex;
+        gap: .7rem;
+        align-items: center;
+        padding: .5rem 0 1.5rem;
+    }
+    
+    .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: white;
+        color: #0d3d2e;
+        font-weight: 800;
+        font-size: 1.4rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 2px solid white;
+    }
+    
+    .brand-name {
+        font-family: 'Manrope';
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: -.04em;
         color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-size: 18px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }}
-    .sidebar-toggle-btn:hover {{
-        background: var(--forest2);
-        transform: scale(1.05);
-    }}
+    }
     
-    /* Theme Toggle Button - Top Right */
-    .theme-toggle-btn {{
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        z-index: 999;
-        background: var(--forest);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-size: 18px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }}
-    .theme-toggle-btn:hover {{
-        background: var(--forest2);
-        transform: scale(1.05);
-    }}
+    .brand-sub {
+        opacity: .6;
+        font-size: .65rem;
+        margin-top: .12rem;
+        color: #dceee2;
+    }
     
-    .theme-toggle-btn.dark {{
-        background: #4a4a6a;
-    }}
-    .theme-toggle-btn.dark:hover {{
-        background: #5a5a7a;
-    }}
+    .side-section {
+        font-size: .64rem;
+        opacity: .5;
+        text-transform: uppercase;
+        letter-spacing: .15em;
+        margin: .9rem 0 .5rem;
+        color: #dceee2;
+    }
     
-    html,body,[class*="css"]{{font-family:'DM Sans',sans-serif}}.stApp{{background:var(--bg);color:var(--ink)}}
-    [data-testid="stHeader"]{{background:transparent}}
-    .block-container{{max-width:1350px;padding:1rem 2.4rem 2rem}}
-    [data-testid="stSidebar"]{{background:var(--forest);border:0}}
-    [data-testid="stSidebar"] *{{color:#dceee2!important}}
-    [data-testid="stSidebar"] hr{{border-color:rgba(255,255,255,.12)}}
-    [data-testid="stSidebar"] .stRadio label{{padding:.45rem .55rem;border-radius:9px}}
-    [data-testid="stSidebar"] .stRadio label:hover{{background:rgba(255,255,255,.08)}}
+    /* Rest of your CSS */
+    html,body,[class*="css"]{font-family:'DM Sans',sans-serif}.stApp{background:var(--bg);color:var(--ink)}
+    [data-testid="stHeader"]{background:transparent}
+    .block-container{max-width:1350px;padding:1rem 2.4rem 2rem;padding-top:70px}
+    [data-testid="stSidebar"]{background:var(--forest);border:0}
+    [data-testid="stSidebar"] *{color:#dceee2!important}
+    [data-testid="stSidebar"] hr{border-color:rgba(255,255,255,.12)}
+    [data-testid="stSidebar"] .stRadio label{padding:.45rem .55rem;border-radius:9px}
+    [data-testid="stSidebar"] .stRadio label:hover{background:rgba(255,255,255,.08)}
     
-    .brand{{display:flex;gap:.7rem;align-items:center;padding:.5rem 0 1.5rem}}
-    .brand-mark{{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--lime);color:var(--forest);font-weight:800;font-size:1.2rem}}
-    .brand-name{{font-family:'Manrope';font-size:1rem;font-weight:800;letter-spacing:-.04em}}
-    .brand-sub{{opacity:.6;font-size:.65rem;margin-top:.12rem}}
-    .side-section{{font-size:.64rem;opacity:.5;text-transform:uppercase;letter-spacing:.15em;margin:.9rem 0 .5rem}}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:.35rem 0 1.3rem;padding-left:70px}
+    .topmark{font-family:'Manrope';font-size:1.15rem;font-weight:800;color:var(--forest);letter-spacing:-.05em}
+    .topmark span{color:var(--green)}
+    .top-actions{display:flex;gap:.6rem;align-items:center}
+    .status{display:inline-flex;align-items:center;gap:.4rem;background:#e7f6eb;color:#277449;border:1px solid #c9e8d0;border-radius:99px;padding:.43rem .65rem;font-size:.7rem;font-weight:700}
+    .dot{width:7px;height:7px;background:#39a86f;border-radius:50%;animation:pulse-dot 2s infinite}
+    @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+    .avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--forest);color:white;font-size:.7rem;font-weight:800}
     
-    .topbar{{display:flex;justify-content:space-between;align-items:center;padding:.35rem 0 1.3rem}}
-    .topmark{{font-family:'Manrope';font-size:1.15rem;font-weight:800;color:var(--forest);letter-spacing:-.05em}}
-    .topmark span{{color:var(--green)}}
-    .top-actions{{display:flex;gap:.6rem;align-items:center}}
-    .status{{display:inline-flex;align-items:center;gap:.4rem;background:#e7f6eb;color:#277449;border:1px solid #c9e8d0;border-radius:99px;padding:.43rem .65rem;font-size:.7rem;font-weight:700}}
-    .dot{{width:7px;height:7px;background:#39a86f;border-radius:50%;animation:pulse-dot 2s infinite}}
-    @keyframes pulse-dot{{0%,100%{{opacity:1;transform:scale(1)}}50%{{opacity:.3;transform:scale(.8)}}}}
-    .avatar{{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--forest);color:white;font-size:.7rem;font-weight:800}}
-    
-    /* Hero section - keeping original */
-    .hero-premium {{
+    .hero-premium {
         background: linear-gradient(135deg, #0a3226 0%, #1a5a44 60%, #0d3d2e 100%);
         border-radius: 24px;
         padding: 2.5rem 3.5rem;
@@ -331,8 +298,8 @@ st.markdown(
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(13, 61, 46, 0.25);
         width: 100%;
-    }}
-    .hero-premium::before {{
+    }
+    .hero-premium::before {
         content: '';
         position: absolute;
         top: -30%;
@@ -342,8 +309,8 @@ st.markdown(
         background: radial-gradient(circle, rgba(46, 155, 98, 0.08) 0%, transparent 70%);
         border-radius: 50%;
         pointer-events: none;
-    }}
-    .hero-premium::after {{
+    }
+    .hero-premium::after {
         content: '';
         position: absolute;
         bottom: -20%;
@@ -353,91 +320,143 @@ st.markdown(
         background: radial-gradient(circle, rgba(46, 155, 98, 0.05) 0%, transparent 70%);
         border-radius: 50%;
         pointer-events: none;
-    }}
-    .hero-content {{ flex: 1.2; position: relative; z-index: 2; }}
-    .hero-visual {{ flex: 0.8; position: relative; z-index: 2; display: flex; justify-content: center; align-items: flex-end; min-height: 280px; }}
-    .hero-badge {{ display: inline-block; background: rgba(46, 155, 98, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(46, 155, 98, 0.25); padding: .35rem 1rem; border-radius: 99px; font-size: .6rem; font-weight: 700; color: #91deb0; letter-spacing: .05em; margin-bottom: .8rem; }}
-    .hero-title {{ font-family: 'Manrope'; font-size: clamp(2rem, 4.5vw, 3.5rem); font-weight: 800; line-height: 1.08; letter-spacing: -0.06em; color: white; margin: 0; max-width: 580px; }}
-    .hero-title .highlight {{ background: linear-gradient(135deg, #bdf0ca, #6bc98a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }}
-    .hero-desc {{ color: rgba(200, 223, 212, 0.9); font-size: .95rem; line-height: 1.6; max-width: 440px; margin: 1rem 0 1.5rem; }}
-    .hero-actions {{ display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }}
-    .btn-primary-hero {{ display: inline-flex; align-items: center; gap: .5rem; background: linear-gradient(135deg, #bdf0ca, #7edba0); color: #0a3226 !important; padding: .75rem 2rem; border-radius: 12px; font-size: .8rem; font-weight: 800; text-decoration: none; transition: all .3s ease; box-shadow: 0 8px 25px rgba(46, 155, 98, 0.3); border: none; cursor: pointer; }}
-    .btn-primary-hero:hover {{ transform: translateY(-3px); box-shadow: 0 12px 35px rgba(46, 155, 98, 0.4); }}
-    .btn-secondary-hero {{ display: inline-flex; align-items: center; gap: .3rem; color: rgba(255, 255, 255, 0.85) !important; font-size: .8rem; font-weight: 600; text-decoration: none; padding: .75rem 1.5rem; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.12); transition: all .3s ease; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); }}
-    .btn-secondary-hero:hover {{ background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.25); transform: translateY(-2px); }}
+    }
+    .hero-content { flex: 1.2; position: relative; z-index: 2; }
+    .hero-visual { flex: 0.8; position: relative; z-index: 2; display: flex; justify-content: center; align-items: flex-end; min-height: 280px; }
+    .hero-badge { display: inline-block; background: rgba(46, 155, 98, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(46, 155, 98, 0.25); padding: .35rem 1rem; border-radius: 99px; font-size: .6rem; font-weight: 700; color: #91deb0; letter-spacing: .05em; margin-bottom: .8rem; }
+    .hero-title { font-family: 'Manrope'; font-size: clamp(2rem, 4.5vw, 3.5rem); font-weight: 800; line-height: 1.08; letter-spacing: -0.06em; color: white; margin: 0; max-width: 580px; }
+    .hero-title .highlight { background: linear-gradient(135deg, #bdf0ca, #6bc98a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-desc { color: rgba(200, 223, 212, 0.9); font-size: .95rem; line-height: 1.6; max-width: 440px; margin: 1rem 0 1.5rem; }
+    .hero-actions { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .btn-primary-hero { display: inline-flex; align-items: center; gap: .5rem; background: linear-gradient(135deg, #bdf0ca, #7edba0); color: #0a3226 !important; padding: .75rem 2rem; border-radius: 12px; font-size: .8rem; font-weight: 800; text-decoration: none; transition: all .3s ease; box-shadow: 0 8px 25px rgba(46, 155, 98, 0.3); border: none; cursor: pointer; }
+    .btn-primary-hero:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(46, 155, 98, 0.4); }
+    .btn-secondary-hero { display: inline-flex; align-items: center; gap: .3rem; color: rgba(255, 255, 255, 0.85) !important; font-size: .8rem; font-weight: 600; text-decoration: none; padding: .75rem 1.5rem; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.12); transition: all .3s ease; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); }
+    .btn-secondary-hero:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.25); transform: translateY(-2px); }
     
-    /* Rest of your existing CSS... */
-    .section-head{{display:flex;justify-content:space-between;align-items:end;margin:2rem 0 .8rem}}
-    .section-title{{font-family:'Manrope';font-size:1.3rem;font-weight:800;letter-spacing:-.045em;color:var(--forest)}}
-    .section-note{{color:var(--muted);font-size:.75rem;margin-top:.2rem}}
-    .view-all{{color:var(--forest2);font-size:.7rem;font-weight:800}}
+    .doctor-combo { display: flex; align-items: flex-end; gap: 0; position: relative; }
+    .paperboard-premium { width: 200px; height: 150px; background: white; border-radius: 16px; padding: 1rem 1.2rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25); transform: rotate(-4deg) translateY(-10px); margin-right: -30px; flex-shrink: 0; position: relative; z-index: 3; transition: transform 0.3s ease; }
+    .paperboard-premium:hover { transform: rotate(-2deg) translateY(-12px); }
+    .paperboard-premium::before { content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 35px; height: 7px; background: #c0ccc0; border-radius: 3px 3px 0 0; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08); }
+    .paperboard-premium .pb-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
+    .paperboard-premium .pb-top-label { font-size: .45rem; font-weight: 800; color: #8a9e8a; text-transform: uppercase; letter-spacing: .08em; }
+    .pb-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #2e9b62; animation: pulse-dot 2s infinite; display: inline-block; }
+    .paperboard-premium .pb-title { font-size: .7rem; font-weight: 700; color: #0a3226; margin-bottom: .2rem; }
+    .paperboard-premium .pb-lines { margin: .2rem 0; }
+    .paperboard-premium .pb-line { height: 4px; border-radius: 99px; background: #eef5ef; margin: .25rem 0; }
+    .paperboard-premium .pb-line.short { width: 40%; }
+    .paperboard-premium .pb-line.medium { width: 65%; }
+    .paperboard-premium .pb-line.long { width: 85%; }
+    .paperboard-premium .pb-footer { display: flex; align-items: center; gap: .4rem; margin-top: .4rem; padding-top: .4rem; border-top: 1.5px solid #eef5ef; }
+    .pb-check-circle { width: 16px; height: 16px; background: #2e9b62; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 800; flex-shrink: 0; }
+    .pb-check-text { color: #2e9b62; font-size: .6rem; font-weight: 700; }
+    .pb-version { margin-left: auto; font-size: .4rem; color: #8a9e8a; font-weight: 700; background: #f0f5f0; padding: .1rem .5rem; border-radius: 99px; }
+    .doctor-portrait-premium { position: relative; z-index: 4; flex-shrink: 0; display: flex; align-items: flex-end; }
+    .doctor-portrait-premium img { width: 160px; height: 225px; object-fit: cover; object-position: top center; border-radius: 80px 80px 0 0; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25); border: 4px solid rgba(255, 255, 255, 0.9); display: block; transition: transform 0.3s ease; }
+    .doctor-portrait-premium img:hover { transform: scale(1.02); }
+    .doctor-ai-badge { position: absolute; top: 5px; right: -5px; background: linear-gradient(135deg, #bdf0ca, #7edba0); color: #0a3226; padding: .25rem .6rem; border-radius: 99px; font-size: .5rem; font-weight: 800; box-shadow: 0 4px 15px rgba(46, 155, 98, 0.3); white-space: nowrap; display: flex; align-items: center; gap: .2rem; }
+    .hero-stats-float { position: absolute; bottom: 15px; left: -15px; background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: .4rem .7rem; z-index: 5; display: flex; align-items: center; gap: .6rem; }
+    .hero-stats-float .stat-item { text-align: center; }
+    .hero-stats-float .stat-num { font-size: 1rem; font-weight: 800; color: #bdf0ca; display: block; }
+    .hero-stats-float .stat-label { font-size: .45rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; letter-spacing: .05em; }
+    .hero-stats-float .stat-divider { width: 1px; height: 25px; background: rgba(255, 255, 255, 0.08); }
     
-    .metrics{{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}}
-    .metric{{background:white;border:1px solid var(--line);border-radius:14px;padding:1rem;transition:all .3s ease}}
-    .metric:hover{{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.05)}}
-    .metric-label{{color:var(--muted);font-size:.65rem;font-weight:700}}
-    .metric-value{{font-family:'Manrope';font-size:1.5rem;color:var(--forest);font-weight:800;margin-top:.2rem}}
-    .metric-meta{{color:#3d9665;font-size:.65rem;margin-top:.1rem}}
+    @media(max-width:1024px) {
+        .hero-premium { flex-direction: column; padding: 2rem 2rem; text-align: center; min-height: auto; }
+        .hero-title { max-width: 100%; }
+        .hero-desc { max-width: 100%; margin-left: auto; margin-right: auto; }
+        .hero-actions { justify-content: center; }
+        .hero-visual { min-height: 200px; width: 100%; }
+        .paperboard-premium { width: 160px; height: 130px; padding: .7rem 1rem; transform: rotate(-3deg) translateY(-8px); margin-right: -20px; }
+        .paperboard-premium .pb-title { font-size: .6rem; }
+        .doctor-portrait-premium img { width: 130px; height: 185px; }
+        .hero-stats-float { display: none; }
+    }
+    @media(max-width:768px) {
+        .hero-premium { padding: 1.5rem 1.2rem; border-radius: 18px; }
+        .hero-title { font-size: clamp(1.5rem, 4.5vw, 2rem); }
+        .paperboard-premium { display: none; }
+        .doctor-portrait-premium img { width: 100px; height: 140px; }
+        .hero-visual { min-height: 150px; }
+        .doctor-ai-badge { font-size: .4rem; padding: .15rem .4rem; top: -5px; right: -5px; }
+        .hero-badge { font-size: .5rem; padding: .25rem .7rem; }
+    }
+    @media(max-width:480px) {
+        .doctor-portrait-premium img { width: 80px; height: 115px; }
+        .hero-visual { min-height: 120px; }
+        .btn-primary-hero, .btn-secondary-hero { font-size: .65rem; padding: .5rem 1rem; }
+    }
     
-    .cards{{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}}
-    .info-card{{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.1rem;min-height:170px;position:relative;overflow:hidden;transition:all .3s ease}}
-    .info-card:hover{{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.05)}}
-    .info-card.green{{background:var(--sage)}}
-    .info-card.cream{{background:var(--cream)}}
-    .badge{{display:inline-block;padding:.3rem .5rem;background:rgba(255,255,255,.7);border-radius:99px;color:var(--forest2);font-size:.6rem;font-weight:800}}
-    .info-title{{font-family:'Manrope';font-size:1rem;line-height:1.1;color:var(--forest);max-width:180px;margin-top:2.2rem}}
-    .info-copy{{font-size:.7rem;color:#668075;line-height:1.4;max-width:200px;margin-top:.4rem}}
-    .info-icon{{position:absolute;right:.8rem;bottom:.8rem;width:48px;height:48px;border-radius:16px;background:var(--forest);color:#bdf0ca;display:grid;place-items:center;font-size:1.2rem}}
+    .section-head{display:flex;justify-content:space-between;align-items:end;margin:2rem 0 .8rem}
+    .section-title{font-family:'Manrope';font-size:1.3rem;font-weight:800;letter-spacing:-.045em;color:var(--forest)}
+    .section-note{color:var(--muted);font-size:.75rem;margin-top:.2rem}
+    .view-all{color:var(--forest2);font-size:.7rem;font-weight:800}
     
-    .who-container{{background:#f8fcff;border:1px solid #c8e4ef;border-left:4px solid #0093d0;border-radius:18px;padding:1.1rem;margin-top:1.5rem;box-shadow:0 4px 15px rgba(0,91,126,.04)}}
-    .who-header{{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.6rem}}
-    .who-logo{{background:linear-gradient(135deg,#0093d0,#007a7a);color:#fff;padding:.35rem .65rem;border-radius:8px;font-size:.65rem;font-weight:800;letter-spacing:.05em}}
-    .who-title{{font-family:'Manrope';font-weight:800;color:var(--forest);font-size:.95rem}}
-    .who-live{{background:#e3f4fa;color:#00749b;padding:.2rem .5rem;border-radius:99px;font-size:.55rem;font-weight:800}}
-    .who-note{{color:#5d7480;font-size:.65rem;line-height:1.4;margin-bottom:.6rem}}
-    .who-post{{display:flex;gap:.7rem;padding:.6rem 0;border-bottom:1px solid #e6f0f3}}
-    .who-post:last-child{{border-bottom:0}}
-    .who-icon{{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#e2f2f7;font-size:1rem;flex-shrink:0}}
-    .who-content{{flex:1}}
-    .who-post-title{{color:var(--forest);font-size:.75rem;font-weight:800}}
-    .who-post-meta{{color:#80959d;font-size:.6rem;margin-top:.15rem}}
-    .who-link{{color:#007a9f;font-size:.62rem;font-weight:800;text-decoration:none;white-space:nowrap}}
-    .who-link:hover{{text-decoration:underline}}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}
+    .metric{background:white;border:1px solid var(--line);border-radius:14px;padding:1rem;transition:all .3s ease}
+    .metric:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.05)}
+    .metric-label{color:var(--muted);font-size:.65rem;font-weight:700}
+    .metric-value{font-family:'Manrope';font-size:1.5rem;color:var(--forest);font-weight:800;margin-top:.2rem}
+    .metric-meta{color:#3d9665;font-size:.65rem;margin-top:.1rem}
     
-    .workspace{{background:white;border-radius:18px;padding:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,.03)}}
-    .workspace-top{{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.7rem}}
-    .workspace-title{{font-family:'Manrope';font-size:1rem;font-weight:800;color:var(--forest)}}
-    .workspace-copy{{color:var(--muted);font-size:.7rem;margin-top:.15rem}}
-    .privacy-tag{{color:var(--forest2);background:#d9f4df;border:1px solid #b5ddbd;border-radius:99px;padding:.3rem .5rem;font-size:.6rem;font-weight:800}}
-    .drop{{background:#edf8ef;border:2px dashed #62ad78;border-radius:12px;padding:.8rem}}
-    [data-testid="stFileUploader"]{{border:0;padding:0;background:transparent}}
-    [data-testid="stFileUploaderDropzone"]{{border:0;background:transparent;min-height:50px}}
-    .hint{{text-align:center;color:var(--muted);font-size:.65rem;margin-top:.2rem}}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+    .info-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.1rem;min-height:170px;position:relative;overflow:hidden;transition:all .3s ease}
+    .info-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.05)}
+    .info-card.green{background:var(--sage)}
+    .info-card.cream{background:var(--cream)}
+    .badge{display:inline-block;padding:.3rem .5rem;background:rgba(255,255,255,.7);border-radius:99px;color:var(--forest2);font-size:.6rem;font-weight:800}
+    .info-title{font-family:'Manrope';font-size:1rem;line-height:1.1;color:var(--forest);max-width:180px;margin-top:2.2rem}
+    .info-copy{font-size:.7rem;color:#668075;line-height:1.4;max-width:200px;margin-top:.4rem}
+    .info-icon{position:absolute;right:.8rem;bottom:.8rem;width:48px;height:48px;border-radius:16px;background:var(--forest);color:#bdf0ca;display:grid;place-items:center;font-size:1.2rem}
     
-    .report-container {{
+    .who-container{background:#f8fcff;border:1px solid #c8e4ef;border-left:4px solid #0093d0;border-radius:18px;padding:1.1rem;margin-top:1.5rem;box-shadow:0 4px 15px rgba(0,91,126,.04)}
+    .who-header{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.6rem}
+    .who-logo{background:linear-gradient(135deg,#0093d0,#007a7a);color:#fff;padding:.35rem .65rem;border-radius:8px;font-size:.65rem;font-weight:800;letter-spacing:.05em}
+    .who-title{font-family:'Manrope';font-weight:800;color:var(--forest);font-size:.95rem}
+    .who-live{background:#e3f4fa;color:#00749b;padding:.2rem .5rem;border-radius:99px;font-size:.55rem;font-weight:800}
+    .who-note{color:#5d7480;font-size:.65rem;line-height:1.4;margin-bottom:.6rem}
+    .who-post{display:flex;gap:.7rem;padding:.6rem 0;border-bottom:1px solid #e6f0f3}
+    .who-post:last-child{border-bottom:0}
+    .who-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#e2f2f7;font-size:1rem;flex-shrink:0}
+    .who-content{flex:1}
+    .who-post-title{color:var(--forest);font-size:.75rem;font-weight:800}
+    .who-post-meta{color:#80959d;font-size:.6rem;margin-top:.15rem}
+    .who-link{color:#007a9f;font-size:.62rem;font-weight:800;text-decoration:none;white-space:nowrap}
+    .who-link:hover{text-decoration:underline}
+    
+    .workspace{background:white;border-radius:18px;padding:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,.03)}
+    .workspace-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.7rem}
+    .workspace-title{font-family:'Manrope';font-size:1rem;font-weight:800;color:var(--forest)}
+    .workspace-copy{color:var(--muted);font-size:.7rem;margin-top:.15rem}
+    .privacy-tag{color:var(--forest2);background:#d9f4df;border:1px solid #b5ddbd;border-radius:99px;padding:.3rem .5rem;font-size:.6rem;font-weight:800}
+    .drop{background:#edf8ef;border:2px dashed #62ad78;border-radius:12px;padding:.8rem}
+    [data-testid="stFileUploader"]{border:0;padding:0;background:transparent}
+    [data-testid="stFileUploaderDropzone"]{border:0;background:transparent;min-height:50px}
+    .hint{text-align:center;color:var(--muted);font-size:.65rem;margin-top:.2rem}
+    
+    .report-container {
         background: white;
         border-radius: 16px;
         overflow: hidden;
         margin-top: .8rem;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
         border: 1px solid var(--line);
-    }}
-    .report-header {{
+    }
+    .report-header {
         padding: 0.8rem 1.5rem;
         background: var(--green-lighter);
         border-bottom: 1px solid var(--line);
         display: flex;
         justify-content: space-between;
         align-items: center;
-    }}
-    .report-header .report-title {{
+    }
+    .report-header .report-title {
         font-family: 'Manrope';
         font-size: 1rem;
         font-weight: 800;
         color: var(--forest);
         letter-spacing: -0.02em;
-    }}
-    .report-header .report-badge {{
+    }
+    .report-header .report-badge {
         background: #e5f6e8;
         color: #277449;
         border-radius: 99px;
@@ -447,15 +466,15 @@ st.markdown(
         display: flex;
         align-items: center;
         gap: .3rem;
-    }}
-    .report-body-wrapper {{
+    }
+    .report-body-wrapper {
         padding: 0.5rem 0.5rem 0.5rem 0.5rem;
         background: var(--green-lighter);
         margin: 0.5rem 1.5rem 0.5rem 1.5rem;
         border-radius: 6px;
         position: relative;
-    }}
-    .report-body-wrapper::before {{
+    }
+    .report-body-wrapper::before {
         content: '';
         position: absolute;
         left: 0;
@@ -464,62 +483,85 @@ st.markdown(
         width: 4px;
         background: var(--green);
         border-radius: 4px 0 0 4px;
-    }}
-    .report-body {{
+    }
+    .report-body {
         padding: 0.8rem 1rem 0.8rem 0.8rem;
         color: var(--ink);
         font-size: .85rem;
         line-height: 1.6;
         margin-left: 8px;
-    }}
-    .report-body p {{ margin: 0.3rem 0; color: var(--ink); }}
-    .report-body h1 {{ font-family: 'Manrope'; font-size: 1.1rem; font-weight: 800; color: var(--forest); margin-top: 0.8rem; margin-bottom: 0.3rem; letter-spacing: -0.02em; }}
-    .report-body h1:first-child {{ margin-top: 0; }}
-    .report-body h2 {{ font-family: 'Manrope'; font-size: 0.9rem; font-weight: 700; color: var(--forest); margin-top: 0.6rem; margin-bottom: 0.2rem; letter-spacing: -0.01em; }}
-    .report-body h3 {{ font-family: 'Manrope'; font-size: 0.85rem; font-weight: 700; color: var(--forest); margin-top: 0.5rem; margin-bottom: 0.2rem; }}
-    .report-body ul, .report-body ol {{ margin: 0.2rem 0 0.2rem 1.2rem; padding-left: 0.3rem; }}
-    .report-body li {{ margin: 0.15rem 0; color: var(--ink); }}
-    .report-body blockquote {{ background: #fff6e9; border-left: 3px solid #e3aa62; padding: .3rem .6rem; color: #795d3a; margin: 0.3rem 0; border-radius: 0 4px 4px 0; font-size: 0.8rem; }}
-    .report-body strong {{ color: var(--forest); font-weight: 700; }}
-    .report-disclaimer {{ padding: 0.5rem 1.5rem 0.8rem 1.5rem; border-top: 1px solid var(--line); }}
-    .report-disclaimer .disclaimer-box {{ background: #fff8ef; border: 1px solid #f3dfc4; border-radius: 8px; padding: .5rem .7rem; color: #795d3a; font-size: .6rem; line-height: 1.4; }}
+    }
+    .report-body p { margin: 0.3rem 0; color: var(--ink); }
+    .report-body h1 { font-family: 'Manrope'; font-size: 1.1rem; font-weight: 800; color: var(--forest); margin-top: 0.8rem; margin-bottom: 0.3rem; letter-spacing: -0.02em; }
+    .report-body h1:first-child { margin-top: 0; }
+    .report-body h2 { font-family: 'Manrope'; font-size: 0.9rem; font-weight: 700; color: var(--forest); margin-top: 0.6rem; margin-bottom: 0.2rem; letter-spacing: -0.01em; }
+    .report-body h3 { font-family: 'Manrope'; font-size: 0.85rem; font-weight: 700; color: var(--forest); margin-top: 0.5rem; margin-bottom: 0.2rem; }
+    .report-body ul, .report-body ol { margin: 0.2rem 0 0.2rem 1.2rem; padding-left: 0.3rem; }
+    .report-body li { margin: 0.15rem 0; color: var(--ink); }
+    .report-body blockquote { background: #fff6e9; border-left: 3px solid #e3aa62; padding: .3rem .6rem; color: #795d3a; margin: 0.3rem 0; border-radius: 0 4px 4px 0; font-size: 0.8rem; }
+    .report-body strong { color: var(--forest); font-weight: 700; }
+    .report-disclaimer { padding: 0.5rem 1.5rem 0.8rem 1.5rem; border-top: 1px solid var(--line); }
+    .report-disclaimer .disclaimer-box { background: #fff8ef; border: 1px solid #f3dfc4; border-radius: 8px; padding: .5rem .7rem; color: #795d3a; font-size: .6rem; line-height: 1.4; }
     
-    .history-item{{display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:1px solid #edf1ed}}
-    .history-item:last-child{{border:0}}
-    .history-name{{color:var(--forest);font-size:.75rem;font-weight:800}}
-    .history-meta{{color:var(--muted);font-size:.62rem;margin-top:.1rem}}
-    .history-status{{color:#317551;background:#edf8ef;padding:.25rem .5rem;border-radius:99px;font-size:.58rem;font-weight:800}}
+    .history-item{display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:1px solid #edf1ed}
+    .history-item:last-child{border:0}
+    .history-name{color:var(--forest);font-size:.75rem;font-weight:800}
+    .history-meta{color:var(--muted);font-size:.62rem;margin-top:.1rem}
+    .history-status{color:#317551;background:#edf8ef;padding:.25rem .5rem;border-radius:99px;font-size:.58rem;font-weight:800}
     
-    .stButton>button{{background:var(--forest2);color:white;border:0;border-radius:12px;min-height:2.4rem;font-weight:800;transition:all .3s ease}}
-    .stButton>button:hover{{background:var(--forest);color:white;transform:translateY(-2px);box-shadow:0 8px 20px rgba(13,61,46,.15)}}
-    .stTabs [data-baseweb="tab-list"]{{gap:.4rem;background:#c5e7cc;border-radius:12px;padding:.25rem}}
-    .stTabs [data-baseweb="tab"]{{font-size:.7rem;font-weight:800;color:var(--forest2);border-radius:8px;padding:.45rem .7rem}}
-    .stTabs [aria-selected="true"]{{background:var(--forest);color:white!important}}
+    .stButton>button{background:var(--forest2);color:white;border:0;border-radius:12px;min-height:2.4rem;font-weight:800;transition:all .3s ease}
+    .stButton>button:hover{background:var(--forest);color:white;transform:translateY(-2px);box-shadow:0 8px 20px rgba(13,61,46,.15)}
+    .stTabs [data-baseweb="tab-list"]{gap:.4rem;background:#c5e7cc;border-radius:12px;padding:.25rem}
+    .stTabs [data-baseweb="tab"]{font-size:.7rem;font-weight:800;color:var(--forest2);border-radius:8px;padding:.45rem .7rem}
+    .stTabs [aria-selected="true"]{background:var(--forest);color:white!important}
     
-    .stTextArea textarea {{
+    .stTextArea textarea {
         font-size: 0.9rem !important;
         border-radius: 12px !important;
         border: 2px solid var(--line) !important;
         padding: 0.8rem !important;
         background: white !important;
-    }}
-    .stTextArea textarea:focus {{
+    }
+    .stTextArea textarea:focus {
         border-color: var(--green) !important;
         box-shadow: 0 0 0 3px rgba(46, 155, 98, 0.1) !important;
-    }}
+    }
     
-    .footer{{text-align:center;color:#6f8b78;font-size:.62rem;padding:1.5rem 0 .5rem}}
+    .footer{text-align:center;color:#6f8b78;font-size:.62rem;padding:1.5rem 0 .5rem}
     
-    @media(max-width:850px){{.metrics{{grid-template-columns:repeat(2,1fr)}}.cards{{grid-template-columns:1fr}}.top-actions .status{{display:none}}.workspace-top{{display:block}}.privacy-tag{{display:inline-block;margin-top:.5rem}}}}
-    @media(max-width:600px){{.report-body-wrapper{{margin:0.3rem 0.8rem;padding:0.3rem}}.report-body{{padding:0.5rem 0.6rem 0.5rem 0.5rem;font-size:.8rem}}}}
+    @media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}.top-actions .status{display:none}.workspace-top{display:block}.privacy-tag{display:inline-block;margin-top:.5rem}}
+    @media(max-width:600px){.report-body-wrapper{margin:0.3rem 0.8rem;padding:0.3rem}.report-body{padding:0.5rem 0.6rem 0.5rem 0.5rem;font-size:.8rem}}
     </style>
     """,
     unsafe_allow_html=True,
 )
 
+# --- Sidebar Toggle Button (Using Streamlit Columns) ---
+# Create a row with the toggle button
+col_toggle, col_spacer = st.columns([1, 20])
+
+with col_toggle:
+    # Display the toggle button
+    if st.button("☰", key="sidebar_toggle", help="Toggle Sidebar"):
+        st.session_state.sidebar_open = not st.session_state.sidebar_open
+        st.rerun()
+
 # --- Sidebar ---
 with st.sidebar:
-    st.markdown('<div class="brand"><div class="brand-mark">✚</div><div><div class="brand-name">MedInsight AI</div><div class="brand-sub">Intelligent Medical Analysis System</div></div></div>', unsafe_allow_html=True)
+    # Brand with Medical Cross (White ✚)
+    st.markdown(
+        """
+        <div class="brand">
+            <div class="brand-mark">✚</div>
+            <div>
+                <div class="brand-name">MedInsight AI</div>
+                <div class="brand-sub">Intelligent Medical Analysis System</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
     st.markdown('<div class="side-section">Main menu</div>', unsafe_allow_html=True)
     page = st.radio("Main menu", ["Dashboard", "New analysis", "WHO knowledge", "History", "Saved insights"], label_visibility="collapsed")
     st.markdown('<div class="side-section">Quick capture</div>', unsafe_allow_html=True)
@@ -529,48 +571,19 @@ with st.sidebar:
     page2 = st.radio("Account and help", ["No extra page", "Safety & privacy", "Settings", "Help centre"], label_visibility="collapsed")
     st.markdown('<hr><div style="font-size:.7rem;opacity:.6;line-height:1.55">MedInsight AI is designed to support understanding—not diagnosis. Always involve a qualified healthcare professional in medical decisions.</div>', unsafe_allow_html=True)
 
-# --- Top Bar with Toggle Buttons ---
-theme_icon = "🌙" if st.session_state.theme == "light" else "☀️"
-sidebar_icon = "◀" if st.session_state.sidebar_state == "expanded" else "▶"
-
-# Sidebar Toggle Button
-st.markdown(
-    f"""
-    <button class="sidebar-toggle-btn" onclick="
-        const sidebar = document.querySelector('[data-testid=\"stSidebar\"]');
-        if (sidebar) {{
-            const isExpanded = sidebar.style.display !== 'none';
-            sidebar.style.display = isExpanded ? 'none' : 'block';
-        }}
-    ">
-        {sidebar_icon}
-    </button>
-    """,
-    unsafe_allow_html=True
-)
-
-# Theme Toggle Button
-st.markdown(
-    f"""
-    <button class="theme-toggle-btn {'dark' if st.session_state.theme == 'dark' else ''}" onclick="
-        window.location.href = window.location.href.split('?')[0] + '?theme=' + (document.body.classList.contains('dark') ? 'light' : 'dark');
-    ">
-        {theme_icon}
-    </button>
-    """,
-    unsafe_allow_html=True
-)
-
-# Handle theme toggle via query params
-query_params = st.query_params
-if "theme" in query_params:
-    if query_params["theme"] == "dark":
-        st.session_state.theme = "dark"
-    else:
-        st.session_state.theme = "light"
-
 # --- Topbar ---
-st.markdown('<div class="topbar"><div class="topmark">MedInsight <span>AI</span></div><div class="top-actions"><div class="status"><span class="dot"></span> System operational</div><div class="avatar">MI</div></div></div>', unsafe_allow_html=True)
+st.markdown(
+    """
+    <div class="topbar">
+        <div class="topmark">MedInsight <span>AI</span></div>
+        <div class="top-actions">
+            <div class="status"><span class="dot"></span> System operational</div>
+            <div class="avatar">MI</div>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # --- Dashboard Page ---
 if page == "Dashboard":
@@ -698,7 +711,6 @@ if page in ["Dashboard", "New analysis"]:
     
     st.markdown('<div class="workspace"><div class="workspace-top"><div><div class="workspace-title">Ask about a medicine or upload a document</div><div class="workspace-copy">Type a medicine name OR upload an image. You can do both too!</div></div><div class="privacy-tag">✦ Information-first, not diagnosis</div></div><div class="drop">', unsafe_allow_html=True)
     
-    # Tabs for different input methods
     tab1, tab2, tab3, tab4 = st.tabs(["💬 Type Question", "📤 Upload Image", "📷 Take Photo", "🎤 Voice Input"])
     
     user_question = ""
@@ -706,7 +718,6 @@ if page in ["Dashboard", "New analysis"]:
     camera_file = None
     voice_text = ""
     
-    # TAB 1: Type Question
     with tab1:
         user_question = st.text_input("💬 What do you want to know?", 
                                       placeholder="e.g., paracetamol, blood test results, or ask about a specific medicine...",
@@ -714,7 +725,6 @@ if page in ["Dashboard", "New analysis"]:
         if user_question:
             st.success(f"🔍 You asked: {user_question}")
     
-    # TAB 2: Upload Image
     with tab2:
         st.markdown("### 📤 Upload a document image")
         uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"], label_visibility="collapsed", key="main_upload")
@@ -724,7 +734,6 @@ if page in ["Dashboard", "New analysis"]:
             st.image(image, caption="Document preview", use_container_width=True)
         st.markdown('<div class="hint">Drop an image here or browse your device · Use a well-lit, in-focus photo</div>', unsafe_allow_html=True)
     
-    # TAB 3: Take Photo
     with tab3:
         st.markdown("### 📷 Take a photo")
         st.caption("Use your camera to capture a document.")
@@ -734,7 +743,6 @@ if page in ["Dashboard", "New analysis"]:
             image = Image.open(camera_file)
             st.image(image, caption="Captured photo", use_container_width=True)
     
-    # TAB 4: Voice Input
     with tab4:
         st.markdown("### 🎤 Speak your question")
         st.caption("Click the microphone and speak clearly about any medicine or health topic.")
@@ -763,15 +771,12 @@ if page in ["Dashboard", "New analysis"]:
     
     st.markdown('</div></div>', unsafe_allow_html=True)
     
-    # Get the image source
     image_source = uploaded_file if uploaded_file is not None else camera_file
     if image_source is None:
         image_source = sidebar_camera_file
     
-    # Get the query text
     query_text = user_question or voice_text
     
-    # Show what's happening
     if query_text and image_source is None:
         st.info(f"💡 You asked: '{query_text}'. Click 'Analyze' to get information.")
     elif query_text and image_source is not None:
@@ -781,7 +786,6 @@ if page in ["Dashboard", "New analysis"]:
     elif not query_text and image_source is None:
         st.info("💡 Type a medicine name, upload a document, or speak your question to get started.")
     
-    # Analysis button
     if st.button("✨ Analyze", use_container_width=True):
         with st.spinner("Analyzing..."):
             try:
@@ -877,11 +881,10 @@ if page == "Saved insights":
     st.markdown('<div class="section-head"><div><div class="section-title">💡 Saved insights</div><div class="section-note">Keep important explanations close for future care conversations.</div></div></div>', unsafe_allow_html=True)
     st.markdown('<div class="cards"><div class="info-card green"><span class="badge">LAB REPORT</span><div class="info-title">What to ask about cholesterol results</div><div class="info-copy">Saved from your complete blood panel analysis.</div></div><div class="info-card cream"><span class="badge">MEDICINE</span><div class="info-title">Dosage and timing notes</div><div class="info-copy">Saved from your medicine label analysis.</div></div></div>', unsafe_allow_html=True)
 
-# --- Safety & Privacy Page ---
+# --- Other Pages ---
 if page2 == "Safety & privacy":
     st.markdown('<div class="section-head"><div><div class="section-title">🔒 Safety & privacy</div><div class="section-note">Understand what MedInsight AI can—and cannot—do.</div></div></div><div class="workspace"><div class="history-item"><div><div class="history-name">Not a diagnostic system</div><div class="history-meta">MedInsight AI summarizes visible document information; it does not diagnose, prescribe, or replace a clinician.</div></div></div><div class="history-item"><div><div class="history-name">Transparent uncertainty</div><div class="history-meta">When an image is unclear or information is missing, the system should flag it rather than guess.</div></div></div><div class="history-item"><div><div class="history-name">Emergency care</div><div class="history-meta">For severe or worsening symptoms, contact local emergency services or seek urgent care.</div></div></div></div>', unsafe_allow_html=True)
 
-# --- Settings Page ---
 if page2 == "Settings":
     st.markdown('<div class="section-head"><div><div class="section-title">⚙️ Settings</div><div class="section-note">Personalize your MedInsight AI workspace.</div></div></div><div class="workspace">', unsafe_allow_html=True)
     st.checkbox("Show safety reminder before every analysis", value=True)
@@ -889,7 +892,6 @@ if page2 == "Settings":
     st.selectbox("Preferred report language", ["English", "Hindi", "Spanish", "French"])
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- Help Centre Page ---
 if page2 == "Help centre":
     st.markdown('<div class="section-head"><div><div class="section-title">❓ Help centre</div><div class="section-note">Quick guidance for getting the clearest results.</div></div></div><div class="workspace"><div class="history-item"><div><div class="history-name">How do I get a better result?</div><div class="history-meta">Use a sharp, well-lit image. Make sure all text is visible and avoid glare.</div></div></div><div class="history-item"><div><div class="history-name">What documents work best?</div><div class="history-meta">Medicine labels, prescriptions, lab reports, discharge summaries, and referral notes.</div></div></div></div>', unsafe_allow_html=True)
 
