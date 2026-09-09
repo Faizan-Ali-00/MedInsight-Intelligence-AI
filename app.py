@@ -162,7 +162,7 @@ def register_analysis(image_source):
     save_usage(usage)
     return True
 
-# --- CSS with Floating Toggle Button ---
+# --- CSS ---
 st.markdown(
     """
     <style>
@@ -185,68 +185,39 @@ st.markdown(
         --danger: #a44145;
     }
     
-    /* Floating Toggle Button */
-    .floating-toggle {
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        z-index: 9999;
-        background: var(--forest);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 44px;
-        height: 44px;
-        font-size: 22px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'DM Sans', sans-serif;
-        border: 2px solid rgba(255,255,255,0.2);
+    /* Sidebar Toggle Button - Proper Styling */
+    .stButton button[data-testid="baseButton-secondary"] {
+        background: #0d3d2e !important;
+        color: white !important;
+        border: 2px solid rgba(255,255,255,0.2) !important;
+        border-radius: 50% !important;
+        width: 44px !important;
+        height: 44px !important;
+        padding: 0 !important;
+        font-size: 22px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+        min-height: unset !important;
+        line-height: 1 !important;
     }
     
-    .floating-toggle:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 25px rgba(0,0,0,0.3);
-        background: var(--forest2);
-        border-color: rgba(255,255,255,0.4);
+    .stButton button[data-testid="baseButton-secondary"]:hover {
+        transform: scale(1.1) !important;
+        background: #1a5a44 !important;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.3) !important;
+        border-color: rgba(255,255,255,0.4) !important;
     }
     
-    .floating-toggle:active {
-        transform: scale(0.95);
-    }
-    
-    /* Tooltip on hover */
-    .floating-toggle::before {
-        content: 'Toggle Sidebar';
-        position: absolute;
-        left: 55px;
-        background: rgba(0,0,0,0.8);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-    }
-    
-    .floating-toggle:hover::before {
-        opacity: 1;
+    .stButton button[data-testid="baseButton-secondary"]:active {
+        transform: scale(0.95) !important;
     }
     
     /* Hide sidebar when closed */
     .sidebar-closed [data-testid="stSidebar"] {
         display: none !important;
-    }
-    
-    .sidebar-closed .block-container {
-        margin-left: 0 !important;
-        max-width: 100% !important;
     }
     
     /* Brand with Medical Cross */
@@ -305,7 +276,7 @@ st.markdown(
     [data-testid="stSidebar"] .stRadio label{padding:.45rem .55rem;border-radius:9px}
     [data-testid="stSidebar"] .stRadio label:hover{background:rgba(255,255,255,.08)}
     
-    .topbar{display:flex;justify-content:space-between;align-items:center;padding:.35rem 0 1.3rem}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:.35rem 0 1.3rem;padding-left:70px}
     .topmark{font-family:'Manrope';font-size:1.15rem;font-weight:800;color:var(--forest);letter-spacing:-.05em}
     .topmark span{color:var(--green)}
     .top-actions{display:flex;gap:.6rem;align-items:center}
@@ -407,28 +378,11 @@ st.markdown(
         .hero-visual { min-height: 150px; }
         .doctor-ai-badge { font-size: .4rem; padding: .15rem .4rem; top: -5px; right: -5px; }
         .hero-badge { font-size: .5rem; padding: .25rem .7rem; }
-        .floating-toggle {
-            width: 38px;
-            height: 38px;
-            font-size: 18px;
-            top: 10px;
-            left: 10px;
-        }
-        .floating-toggle::before {
-            display: none;
-        }
     }
     @media(max-width:480px) {
         .doctor-portrait-premium img { width: 80px; height: 115px; }
         .hero-visual { min-height: 120px; }
         .btn-primary-hero, .btn-secondary-hero { font-size: .65rem; padding: .5rem 1rem; }
-        .floating-toggle {
-            width: 34px;
-            height: 34px;
-            font-size: 16px;
-            top: 8px;
-            left: 8px;
-        }
     }
     
     .section-head{display:flex;justify-content:space-between;align-items:end;margin:2rem 0 .8rem}
@@ -581,29 +535,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Floating Toggle Button (Using HTML) ---
-sidebar_icon = "☰"
+# --- Sidebar Toggle Button (Using Streamlit Button) ---
+# Create a small row for the toggle button
+col1, col2 = st.columns([1, 20])
 
-st.markdown(
-    f"""
-    <button class="floating-toggle" onclick="
-        const sidebar = document.querySelector('[data-testid=\"stSidebar\"]');
-        if (sidebar) {{
-            const isExpanded = sidebar.style.display !== 'none';
-            sidebar.style.display = isExpanded ? 'none' : 'block';
-            // Also adjust main content
-            const mainContent = document.querySelector('.block-container');
-            if (mainContent) {{
-                mainContent.style.marginLeft = isExpanded ? '0' : '0';
-                mainContent.style.maxWidth = isExpanded ? '100%' : '1350px';
-            }}
-        }}
-    ">
-        {sidebar_icon}
-    </button>
-    """,
-    unsafe_allow_html=True,
-)
+with col1:
+    if st.button("☰", key="sidebar_toggle", help="Toggle Sidebar", type="secondary"):
+        st.session_state.sidebar_open = not st.session_state.sidebar_open
+        st.rerun()
 
 # --- Sidebar ---
 with st.sidebar:
