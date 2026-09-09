@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: transparent;
+  }
+  .cam-wrap {
+    background: #edf8ef;
+    border: 2px dashed #62ad78;
+    border-radius: 14px;
+    padding: 10px;
+    text-align: center;
+  }
+  video, img.captured {
+    width: 100%;
+    max-height: 380px;
+    border-radius: 10px;
+    background: #0d3d2e;
+    object-fit: cover;
+    display: block;
+  }
+  .cam-btn-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  button.cam-btn {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: white;
+    background: #1a5a44;
+    transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
+  }
+  button.cam-btn:hover {
+    background: #0d3d2e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(13,61,46,.15);
+  }
+  button.cam-btn:active { transform: translateY(0); }
+  button.cam-btn.secondary { background: #5a7a6a; }
+  .cam-status {
+    color: #5a7a6a;
+    font-size: 0.72rem;
+    margin-top: 8px;
+    min-height: 1.1em;
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="cam-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <img id="captured" class="captured hidden" alt="Captured document" />
+    <div class="cam-btn-row">
+      <button class="cam-btn" id="captureBtn">📸 Capture photo</button>
+      <button class="cam-btn secondary hidden" id="retakeBtn">🔄 Retake</button>
+    </div>
+    <div class="cam-status" id="status">Starting back camera…</div>
+  </div>
+  <canvas id="canvas" class="hidden"></canvas>
+
+<script>
+(function () {
+  function sendToStreamlit(type, extra) {
+    var payload = Object.assign({ isStreamlitMessage: true, type: type }, extra || {});
+    window.parent.postMessage(payload, "*");
+  }
+  function setFrameHeight() {
+    var h = document.documentElement.scrollHeight;
+    sendToStreamlit("streamlit:setFrameHeight", { height: h });
+  }
+  function setComponentValue(value) {
+    sendToStreamlit("streamlit:setComponentValue", { value: value, dataType: "json" });
+  }
+
+  var video = document.getElementById("video");
+  var canvas = document.getElementById("canvas");
+  var capturedImg = document.getElementById("captured");
+  var captureBtn = document.getElementById("captureBtn");
+  var retakeBtn = document.getElementById("retakeBtn");
+  var statusEl = document.getElementById("status");
+  var currentStream = null;
+
+  function stopStream() {
+    if (currentStream) {
+      currentStream.getTracks().forEach(function (t) { t.stop(); });
+      currentStream = null;
+    }
+  }
+
+  function startCamera() {
+    stopStream();
+    statusEl.textContent = "Starting back camera…";
+    video.classList.remove("hidden");
+    capturedImg.classList.add("hidden");
+    captureBtn.classList.remove("hidden");
+    retakeBtn.classList.add("hidden");
+
+    var constraints = { video: { facingMode: { ideal: "environment" } }, audio: false };
+    navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+      currentStream = stream;
+      video.srcObject = stream;
+      statusEl.textContent = "Point at your document, then tap Capture photo.";
+      setFrameHeight();
+    }).catch(function (err) {
+      statusEl.textContent = "Couldn't open the camera (" + err.message + "). Check camera permissions and reload.";
+      setFrameHeight();
+    });
+  }
+
+  captureBtn.addEventListener("click", function () {
+    var w = video.videoWidth || 640;
+    var h = video.videoHeight || 480;
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, w, h);
+    var dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+
+    capturedImg.src = dataUrl;
+    capturedImg.classList.remove("hidden");
+    video.classList.add("hidden");
+    captureBtn.classList.add("hidden");
+    retakeBtn.classList.remove("hidden");
+    statusEl.textContent = "Photo captured. Tap Retake to try again.";
+
+    stopStream();
+    setComponentValue(dataUrl);
+    setFrameHeight();
+  });
+
+  retakeBtn.addEventListener("click", function () {
+    setComponentValue(null);
+    startCamera();
+  });
+
+  window.addEventListener("message", function (event) {
+    if (event.data && event.data.type === "streamlit:render") {
+      setFrameHeight();
+    }
+  });
+
+  sendToStreamlit("streamlit:componentReady", { apiVersion: 1 });
+  setFrameHeight();
+  startCamera();
+})();
+</script>
+</body>
+</html>
